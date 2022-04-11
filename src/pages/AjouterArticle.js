@@ -2,7 +2,6 @@ import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
-import FormControl from "@mui/material/FormControl";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
@@ -10,11 +9,44 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
 import { Grid } from "@mui/material";
 import { useState } from "react";
+import { ajouterArticle } from "../controleurs/ArticleControleurs";
+import MenuItem from "@mui/material/MenuItem";
+import { styled } from "@mui/material/styles";
+import { storage } from "../Helpers/FireBase";
+import { createUUID } from "../Helpers/Helper";
 
+const currencies = [
+  {
+    value: "Disponible",
+    label: "Disponible",
+  },
+  {
+    value: "Reservé",
+    label: "Reservé",
+  },
+  {
+    value: "Retiré",
+    label: "Retiré",
+  },
+  {
+    value: "Perimé",
+    label: "Perimé",
+  },
+];
 export default function Ajouter() {
+  const [currency, setCurrency] = useState("");
+  const handleChange = (event) => {
+    setCurrency(event.target.value);
+  };
+
+  const Input = styled("input")({
+    display: "none",
+  });
   const theme = createTheme();
   const [errors, setErrors] = useState({
     titreArticle: "",
+    nomPointVente: "",
+    nomCommercant: "",
     prixInitial: "",
     prixActuel: "",
     quantite: "",
@@ -24,12 +56,59 @@ export default function Ajouter() {
     statut: "",
     description: "",
   });
+
+  //ajouter image
+  const [image, setImage] = useState(null);
+  const [url, setUrl] = useState("");
+  const [progress, setProgress] = useState(0);
+
+  const handleChangee = (e) => {
+    if (e.target.files[0]) {
+      setImage(e.target.files[0]);
+      console.log("image", e.target.files[0]);
+      handleUpload(e.target.files[0]);
+    }
+  };
+
+  const handleUpload = (_image) => {
+    let imageName = createUUID() + _image.name;
+    const uploadTask = storage.ref(`images/${imageName}`).put(_image);
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        const progress = Math.round(
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+        );
+        setProgress(progress);
+      },
+      (error) => {
+        console.log(error);
+      },
+      () => {
+        storage
+          .ref("images")
+          .child(imageName)
+          .getDownloadURL()
+          .then((url) => {
+            setUrl(url);
+            console.log(url);
+          })
+          .catch((error) => {
+            console.log(" !! ", error);
+          });
+      }
+    );
+  };
+
+  // console.log("image: ", image);
+
   const regNum = new RegExp("^[0-9\b]+$");
   const regNom = new RegExp("^[a-zA-Z]+[a-zA-Z]+$");
   const regDate = new RegExp(
     "^([0]?[1-9]|[1|2][0-9]|[3][0|1])[./-]([0]?[1-9]|[1][0-2])[./-]([0-9]{4}|[0-9]{2})$"
   );
 
+  // validation formulaire
   const isFormValid = (data) => {
     const _errors = { ...errors };
     if (!data.titreArticle) {
@@ -37,6 +116,18 @@ export default function Ajouter() {
     } else if (!regNom.test(data.titreArticle)) {
       _errors.titreArticle = "Titre contient uniquement des lettres ";
     } else _errors.titreArticle = "";
+
+    if (!data.nomPointVente) {
+      _errors.nomPointVente = "Nom point vente est obligatoire";
+    } else if (!regNom.test(data.nomPointVente)) {
+      _errors.nomPointVente = "Nom contient uniquement des lettres ";
+    } else _errors.nomPointVente = "";
+
+    if (!data.nomCommercant) {
+      _errors.nomCommercant = "Nom commerçant est obligatoire";
+    } else if (!regNom.test(data.nomCommercant)) {
+      _errors.nomCommercant = "Nom contient uniquement des lettres ";
+    } else _errors.nomCommercant = "";
 
     if (!data.prixInitial) {
       _errors.prixInitial = "Prix initial est obligatoire";
@@ -75,9 +166,7 @@ export default function Ajouter() {
     } else _errors.dateretrait = "";
 
     if (!data.statut) {
-      _errors.statut = "Statut est obligatoire";
-    } else if (!regNom.test(data.statut)) {
-      _errors.statut = "Statut contient uniquement des lettres ";
+      _errors.statut = "Selectionner le statut ";
     } else _errors.statut = "";
 
     if (!data.description) {
@@ -90,11 +179,15 @@ export default function Ajouter() {
     } else return false;
   };
 
+  // form submit
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const dataValues = {
       titreArticle: data.get("titreArticle"),
+      urlImage: url,
+      nomCommercant: data.get("nomCommercant"),
+      nomPointVente: data.get("nomPointVente"),
       prixInitial: data.get("prixInitial"),
       prixActuel: data.get("prixActuel"),
       quantite: data.get("quantite"),
@@ -106,6 +199,16 @@ export default function Ajouter() {
     };
     if (isFormValid(dataValues)) {
       console.log("form valid");
+      console.log("______ ", dataValues);
+
+      ajouterArticle(dataValues)
+        .then(() => {
+          console.log("article saved with succes");
+          console.log("______ ", dataValues);
+        })
+        .catch(() => {
+          console.log("something went wrong !! ");
+        });
     } else console.log("form nom valid");
   };
 
@@ -146,6 +249,34 @@ export default function Ajouter() {
                   error={errors.titreArticle ? true : false}
                   helperText={errors.titreArticle}
                   autoFocus
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="nomPointVente"
+                  label="Nom point de vente"
+                  name="nomPointVente"
+                  autoComplete="nomPointVente"
+                  error={errors.nomPointVente ? true : false}
+                  helperText={errors.nomPointVente}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="nomCommercant"
+                  label="Nom commerçant"
+                  name="nomCommercant"
+                  autoComplete="nomCommercant"
+                  error={errors.nomCommercant ? true : false}
+                  helperText={errors.nomCommercant}
                 />
               </Grid>
 
@@ -249,7 +380,16 @@ export default function Ajouter() {
                   autoComplete="statut"
                   error={errors.statut ? true : false}
                   helperText={errors.statut}
-                />
+                  select
+                  value={currency}
+                  onChange={handleChange}
+                >
+                  {currencies.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
               </Grid>
 
               <Grid item xs={12}>
@@ -269,15 +409,38 @@ export default function Ajouter() {
                 />
               </Grid>
             </Grid>
+            <Grid item xs={12}>
+              <label htmlFor="contained-button-file">
+                <Input
+                  accept="image/*"
+                  id="contained-button-file"
+                  multiple
+                  type="file"
+                  onChange={handleChangee}
+                />
+                <Button variant="contained" component="span" fullWidth>
+                  Télécharger image
+                </Button>
+              </label>
+            </Grid>
+            <Grid item xs={12}>
+              <img
+                src={`${url}?w=164&h=164&fit=crop&auto=format`}
+                loading="lazy"
+                sx={{ width: 300, height: 200 }}
+              />
+            </Grid>
 
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-            >
-              Ajouter
-            </Button>
+            <Grid item xs={12}>
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                sx={{ mt: 3, mb: 2 }}
+              >
+                Ajouter
+              </Button>
+            </Grid>
           </Box>
         </Box>
       </Container>

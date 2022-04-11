@@ -2,13 +2,13 @@ import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
-import FormControlLabel from "@mui/material/FormControlLabel";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import StorefrontIcon from "@mui/icons-material/Storefront";
 import { useState } from "react";
+import { ajouterPointVente } from "../controleurs/PointDeVenteControleur";
 
 const theme = createTheme();
 
@@ -16,13 +16,14 @@ export default function AjouterPointVente() {
   const [errors, setErrors] = useState({
     titrePointVente: "",
     email: "",
-    adresse: "",
+    adressePointVente: "",
     numerotlf: "",
   });
+
   const pattern = new RegExp("^[a-zA-Z0-9]+@[a-zA-Z0-9]+[.][A-Za-z]+$");
   const regNom = new RegExp("^[a-zA-Z]+[a-zA-Z]+$");
   const regNum = new RegExp("^[0-9\b]+$");
-
+  //validation formulaire
   const isFormValid = (data) => {
     const _errors = { ...errors };
     if (!data.titrePointVente) {
@@ -37,11 +38,12 @@ export default function AjouterPointVente() {
       _errors.email = "Vérifier votre email";
     } else _errors.email = "";
 
-    if (!data.adresse) {
-      _errors.adresse = "Adresse est obligatoire";
-    } else if (!regNom.test(data.adresse)) {
-      _errors.adresse = "Le titre doit contenir seulement des lettres";
-    } else _errors.adresse = "";
+    if (!data.adressePointVente) {
+      _errors.adressePointVente = "Adresse est obligatoire";
+    } else if (!regNom.test(data.adressePointVente)) {
+      _errors.adressePointVente =
+        "Le titre doit contenir seulement des lettres";
+    } else _errors.adressePointVente = "";
 
     if (!data.numerotlf) {
       _errors.numerotlf = "Numero téléphone est obligatoire";
@@ -63,11 +65,19 @@ export default function AjouterPointVente() {
     const dataValues = {
       titrePointVente: data.get("titrePointVente"),
       email: data.get("email"),
-      adresse: data.get("adresse"),
+      adressePointVente: data.get("adressePointVente"),
       numerotlf: data.get("numerotlf"),
     };
     if (isFormValid(dataValues)) {
       console.log("form valid");
+      ajouterPointVente(dataValues)
+        .then(() => {
+          console.log("point de vente est ajouté");
+          console.log("______ ", dataValues);
+        })
+        .catch(() => {
+          console.log("something went wrong !! ");
+        });
     } else console.log("form nom valid");
   };
 
@@ -112,12 +122,12 @@ export default function AjouterPointVente() {
               margin="normal"
               required
               fullWidth
-              id="adresse"
+              id="adressePointVente"
               label="Adresse point vente"
-              name="adresse"
-              error={errors.adresse ? true : false}
-              helperText={errors.adresse}
-              autoComplete="adresse"
+              name="adressePointVente"
+              error={errors.adressePointVente ? true : false}
+              helperText={errors.adressePointVente}
+              autoComplete="adressePointVente"
             />
 
             <TextField

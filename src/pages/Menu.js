@@ -26,7 +26,8 @@ import Collapse from "@mui/material/Collapse";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import ListAltIcon from "@mui/icons-material/ListAlt";
 import AddBusinessIcon from "@mui/icons-material/AddBusiness";
-
+import LogoutIcon from "@mui/icons-material/Logout";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 const drawerWidth = 240;
 
 const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
@@ -245,6 +246,25 @@ export default function Menu({ children }) {
         </List>
 
         <Divider />
+
+        <ListItem
+          button
+          onClick={() => {
+            navigate("/modifier/compte");
+          }}
+        >
+          <ListItemIcon>
+            <AccountCircleIcon color="primary" />
+          </ListItemIcon>
+          <ListItemText primary={"Modifier compte"} />
+        </ListItem>
+
+        <ListItem button>
+          <ListItemIcon>
+            <LogoutIcon color="primary" />
+          </ListItemIcon>
+          <ListItemText primary={"Déconnexion"} />
+        </ListItem>
       </Drawer>
       <Main open={open}>
         <DrawerHeader />

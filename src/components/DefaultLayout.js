@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import ConsulterArticles from "../pages/ConsulterArticles";
 import Statistique from "../pages/Statistique";
@@ -8,6 +8,8 @@ import AjouterPointVente from "../pages/AjouterPointVente";
 import ModifierArticle from "../pages/ModifierArticle";
 import ModifierPointVente from "../pages/ModifierPointVente";
 import Menu from "../pages/Menu";
+import ModifierCompte from "../pages/ModifierCompte";
+import Detail from "../pages/Detail";
 
 function DefaultLayout() {
   return (
@@ -27,11 +29,17 @@ function DefaultLayout() {
           path="/ajouter/pointvente"
           element={<AjouterPointVente />}
         ></Route>
-        <Route path="/modifier/article" element={<ModifierArticle />}></Route>
+        -
         <Route
-          path="/modifier/pointvente"
+          path="/modifier/article/:id"
+          element={<ModifierArticle />}
+        ></Route>
+        <Route
+          path="/modifier/pointvente/:id"
           element={<ModifierPointVente />}
         ></Route>
+        <Route path="/modifier/compte" element={<ModifierCompte />}></Route>
+        <Route path="/detail/:id" element={<Detail />}></Route>
       </Routes>
     </Menu>
   );

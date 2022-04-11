@@ -15,10 +15,10 @@ import { Box, makeStyles, Typography } from "@mui/material";
 import Button from "@mui/material/Button";
 import CancelIcon from "@mui/icons-material/Cancel";
 import ReportProblemIcon from "@mui/icons-material/ReportProblem";
-
-function createData(titre, adresse, email, numerotlf) {
-  return { titre, adresse, email, numerotlf };
-}
+import { useState, useEffect } from "react";
+import { consulterListePointsVente } from "../controleurs/PointDeVenteControleur";
+import { deletePointVente } from "../controleurs/PointDeVenteControleur";
+import FindInPageIcon from "@mui/icons-material/FindInPage";
 
 export default function ConsulterPointsVente() {
   const style = {
@@ -34,52 +34,88 @@ export default function ConsulterPointsVente() {
     p: 4,
   };
 
-  const [open, setOpen] = React.useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  //consulter liste des articles
+  const [rows, setRows] = useState([]);
+  useEffect(() => {
+    console.log("use effect here");
+    consulterListePointsVente().then((snapshot) => {
+      console.log(snapshot);
+      let values = snapshot.docs.map((doc) => doc.data());
+      console.log(values);
+      setRows(values);
+    });
+    console.log("message");
+  }, []);
 
+  const [selectId, setSelectId] = useState("");
+  //supprimer point vente
+  const supprimerPointDeVente = () => {
+    deletePointVente(selectId)
+      .then(() => {
+        console.log("Document successfully deleted!");
+      })
+      .catch((error) => {
+        console.error("Error removing document: ", error);
+      });
+  };
+
+  //selectionner id point vente
+  const [open, setOpen] = useState(false);
+  function handleOpen(event, id) {
+    setSelectId(id);
+    setOpen(true);
+    console.log(id);
+  }
+
+  const handleClose = () => setOpen(false);
   const navigate = useNavigate();
-  const rows = [
-    createData("PointVente1", "Rue1", "exemple1@gmail.com", 73256978),
-    createData("PointVente2", "Rue2", "exemple2@gmail.com", 75896412),
-    createData("PointVente3", "Rue3", "exemple3@gmail.com", 74521369),
-    createData("PointVente4", "Rue4", "exemple4@gmail.com", 79563214),
-  ];
+
   return (
     <div>
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
           <TableHead>
             <TableRow>
-              <TableCell>Points de vente</TableCell>
-              <TableCell align="right">Adresse</TableCell>
-              <TableCell align="right">Email</TableCell>
+              <TableCell align="right"> Id point vente</TableCell>
+              <TableCell align="right"> Titre point vente</TableCell>
+              <TableCell align="right">Aresse point vente</TableCell>
+              <TableCell align="right">Email point vente</TableCell>
               <TableCell align="right">Numero téléphone</TableCell>
-              <TableCell align="right">Action</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((row) => (
+            {rows.map((row, id) => (
               <TableRow
-                key={row.titre}
+                key={id}
                 sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
               >
-                <TableCell component="th" scope="row">
-                  {row.titre}
-                </TableCell>
-                <TableCell align="right">{row.adresse}</TableCell>
+                <TableCell align="right">{row.id}</TableCell>
+                <TableCell align="right">{row.titrePointVente}</TableCell>
+                <TableCell align="right">{row.adressePointVente}</TableCell>
                 <TableCell align="right">{row.email}</TableCell>
                 <TableCell align="right">{row.numerotlf}</TableCell>
+
                 <TableCell align="right">
-                  <IconButton onClick={handleOpen}>
+                  <IconButton
+                    onClick={(event) => {
+                      handleOpen(event, row.id);
+                    }}
+                  >
                     <DeleteIcon color="primary" />
                   </IconButton>
                   <IconButton
                     onClick={() => {
-                      navigate("/modifier/pointvente");
+                      navigate("/modifier/pointvente/" + row.id);
                     }}
                   >
                     <AutorenewIcon color="primary" />
+                  </IconButton>
+                  <IconButton
+                    onClick={() => {
+                      navigate("/detail/" + row.id);
+                    }}
+                  >
+                    <FindInPageIcon color="primary" />
                   </IconButton>
                 </TableCell>
               </TableRow>
@@ -95,9 +131,9 @@ export default function ConsulterPointsVente() {
         aria-describedby="keep-mounted-modal-description"
       >
         <Box sx={style}>
-          <Typography variant="h6" align="center" color="primary">
+          <Typography variant="h5" align="center" color="primary">
             <ReportProblemIcon color="error" sx={{ fontSize: 38 }} />
-            Vous êtes sur de supprimer cet point de vente !
+            Vous êtes sur de supprimer cette point de vente {selectId}!
           </Typography>
           <Button
             variant="outlined"
@@ -105,9 +141,7 @@ export default function ConsulterPointsVente() {
             size="large"
             color="error"
             sx={{ margin: 8 }}
-            onClick={() => {
-              console.log("supprimer", rows.localisation);
-            }}
+            onClick={supprimerPointDeVente}
           >
             supprimer
           </Button>

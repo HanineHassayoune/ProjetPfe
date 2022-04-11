@@ -3,17 +3,15 @@ import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
-import Link from "@mui/material/Link";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { useState } from "react";
+import { creerCompte } from "../controleurs/CompteControleur";
+import Link from "@mui/material/Link";
 const theme = createTheme();
 
 export default function CreerCompte() {
@@ -67,6 +65,14 @@ export default function CreerCompte() {
     };
     if (isFormValid(dataValues)) {
       console.log("form valid");
+      creerCompte(dataValues)
+        .then(() => {
+          console.log("compte est ajouté");
+          console.log("______ ", dataValues);
+        })
+        .catch(() => {
+          console.log("something went wrong !! ");
+        });
     } else {
       console.log("form non valid");
     }
@@ -168,6 +174,19 @@ export default function CreerCompte() {
               >
                 S'inscrire
               </Button>
+
+              <Grid container>
+                <Grid item xs>
+                  <Link href="/mdp/oublie" variant="body2">
+                    Mots de passe oublié?
+                  </Link>
+                </Grid>
+                <Grid item>
+                  <Link href="/connexion" variant="body2">
+                    {"Connexion"}
+                  </Link>
+                </Grid>
+              </Grid>
             </Box>
           </Box>
         </Grid>
