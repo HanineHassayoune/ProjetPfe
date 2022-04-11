@@ -17,6 +17,7 @@ function intersection(a, b) {
 }
 
 export default function TransferList() {
+  console.log("hanine");
   const [checked, setChecked] = React.useState([]);
   const [left, setLeft] = React.useState([0, 1, 2, 3]);
   const [right, setRight] = React.useState([4, 5, 6, 7]);
