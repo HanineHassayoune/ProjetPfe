@@ -122,19 +122,45 @@ export default function ConsulterArticles() {
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
           <TableHead>
             <TableRow>
-              <TableCell align="right"> Id article</TableCell>
-              <TableCell align="right"> Titre article</TableCell>
-              <TableCell align="right">Nom point vente</TableCell>
-              <TableCell align="right">Nom commerçant</TableCell>
-              <TableCell align="right">Prix initial</TableCell>
-              <TableCell align="right">Prix actuel</TableCell>
-              <TableCell align="right">Unité</TableCell>
-              <TableCell align="right">Quantité</TableCell>
-              <TableCell align="right">Date de validité</TableCell>
-              <TableCell align="right">Date du retrait</TableCell>
-              <TableCell align="right">Statut</TableCell>
-              <TableCell align="right">Description</TableCell>
-              <TableCell align="right">Action</TableCell>
+              <TableCell align="center" bgcolor="#e3f2fd">
+                Id article
+              </TableCell>
+              <TableCell align="center" bgcolor="#e3f2fd">
+                Titre article
+              </TableCell>
+              <TableCell align="center" bgcolor="#e3f2fd">
+                Nom point vente
+              </TableCell>
+              <TableCell align="center" bgcolor="#e3f2fd">
+                Nom commerçant
+              </TableCell>
+              <TableCell align="center" bgcolor="#e3f2fd">
+                Prix initial
+              </TableCell>
+              <TableCell align="center" bgcolor="#e3f2fd">
+                Prix actuel
+              </TableCell>
+              <TableCell align="center" bgcolor="#e3f2fd">
+                Unité
+              </TableCell>
+              <TableCell align="center" bgcolor="#e3f2fd">
+                Quantité
+              </TableCell>
+              <TableCell align="center" bgcolor="#e3f2fd">
+                Date de validité
+              </TableCell>
+              <TableCell align="center" bgcolor="#e3f2fd">
+                Date du retrait
+              </TableCell>
+              <TableCell align="center" bgcolor="#e3f2fd">
+                Statut
+              </TableCell>
+              <TableCell align="center" bgcolor="#e3f2fd">
+                Description
+              </TableCell>
+              <TableCell align="center" bgcolor="#e3f2fd">
+                Action
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -146,19 +172,21 @@ export default function ConsulterArticles() {
                 {/*<TableCell component="th" scope="row">
                   {row.id}
             </TableCell>*/}
-                <TableCell align="right">{row.id}</TableCell>
-                <TableCell align="right">{row.titreArticle}</TableCell>
-                <TableCell align="right">{row.nomPointVente}</TableCell>
-                <TableCell align="right">{row.nomCommercant}</TableCell>
-                <TableCell align="right">{row.prixInitial}</TableCell>
-                <TableCell align="right">{row.prixActuel}</TableCell>
-                <TableCell align="right">{row.unite}</TableCell>
-                <TableCell align="right">{row.quantite}</TableCell>
-                <TableCell align="right">{row.datevalidite}</TableCell>
-                <TableCell align="right">{row.dateretrait}</TableCell>
-                <TableCell align="right">{row.statut}</TableCell>
-                <TableCell align="right">{row.description}</TableCell>
-                <TableCell align="right">
+                <TableCell align="right" bgcolor="#e3f2fd">
+                  {row.id}
+                </TableCell>
+                <TableCell align="center">{row.titreArticle}</TableCell>
+                <TableCell align="center">{row.nomPointVente}</TableCell>
+                <TableCell align="center">{row.nomCommercant}</TableCell>
+                <TableCell align="center">{row.prixInitial}</TableCell>
+                <TableCell align="center">{row.prixActuel}</TableCell>
+                <TableCell align="center">{row.unite}</TableCell>
+                <TableCell align="center">{row.quantite}</TableCell>
+                <TableCell align="center">{row.datevalidite}</TableCell>
+                <TableCell align="center">{row.dateretrait}</TableCell>
+                <TableCell align="center">{row.statut}</TableCell>
+                <TableCell align="center">{row.description}</TableCell>
+                <TableCell align="center">
                   <IconButton
                     onClick={(event) => {
                       handleOpen(event, row.id);

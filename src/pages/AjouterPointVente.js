@@ -9,6 +9,9 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import StorefrontIcon from "@mui/icons-material/Storefront";
 import { useState } from "react";
 import { ajouterPointVente } from "../controleurs/PointDeVenteControleur";
+import Alert from "@mui/material/Alert";
+import AlertTitle from "@mui/material/AlertTitle";
+import { useNavigate } from "react-router-dom";
 
 const theme = createTheme();
 
@@ -19,7 +22,7 @@ export default function AjouterPointVente() {
     adressePointVente: "",
     numerotlf: "",
   });
-
+  const navigate = useNavigate();
   const pattern = new RegExp("^[a-zA-Z0-9]+@[a-zA-Z0-9]+[.][A-Za-z]+$");
   const regNom = new RegExp("^[a-zA-Z]+[a-zA-Z]+$");
   const regNum = new RegExp("^[0-9\b]+$");
@@ -40,9 +43,6 @@ export default function AjouterPointVente() {
 
     if (!data.adressePointVente) {
       _errors.adressePointVente = "Adresse est obligatoire";
-    } else if (!regNom.test(data.adressePointVente)) {
-      _errors.adressePointVente =
-        "Le titre doit contenir seulement des lettres";
     } else _errors.adressePointVente = "";
 
     if (!data.numerotlf) {
@@ -73,7 +73,9 @@ export default function AjouterPointVente() {
       ajouterPointVente(dataValues)
         .then(() => {
           console.log("point de vente est ajouté");
+          alert("Votre point de vente est ajouté avec avec succès");
           console.log("______ ", dataValues);
+          navigate("/consulter/pointsvente");
         })
         .catch(() => {
           console.log("something went wrong !! ");

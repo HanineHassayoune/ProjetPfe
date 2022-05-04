@@ -76,11 +76,24 @@ export default function ConsulterPointsVente() {
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
           <TableHead>
             <TableRow>
-              <TableCell align="right"> Id point vente</TableCell>
-              <TableCell align="right"> Titre point vente</TableCell>
-              <TableCell align="right">Aresse point vente</TableCell>
-              <TableCell align="right">Email point vente</TableCell>
-              <TableCell align="right">Numero téléphone</TableCell>
+              <TableCell align="center" bgcolor="#e3f2fd">
+                Id point vente
+              </TableCell>
+              <TableCell align="center" bgcolor="#e3f2fd">
+                Titre point vente
+              </TableCell>
+              <TableCell align="center" bgcolor="#e3f2fd">
+                Aresse point vente
+              </TableCell>
+              <TableCell align="center" bgcolor="#e3f2fd">
+                Email point vente
+              </TableCell>
+              <TableCell align="center" bgcolor="#e3f2fd">
+                Numero téléphone
+              </TableCell>
+              <TableCell align="center" bgcolor="#e3f2fd">
+                Action
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -89,13 +102,15 @@ export default function ConsulterPointsVente() {
                 key={id}
                 sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
               >
-                <TableCell align="right">{row.id}</TableCell>
-                <TableCell align="right">{row.titrePointVente}</TableCell>
-                <TableCell align="right">{row.adressePointVente}</TableCell>
-                <TableCell align="right">{row.email}</TableCell>
-                <TableCell align="right">{row.numerotlf}</TableCell>
+                <TableCell align="center" bgcolor="#e3f2fd">
+                  {row.id}
+                </TableCell>
+                <TableCell align="center">{row.titrePointVente}</TableCell>
+                <TableCell align="center">{row.adressePointVente}</TableCell>
+                <TableCell align="center">{row.email}</TableCell>
+                <TableCell align="center">{row.numerotlf}</TableCell>
 
-                <TableCell align="right">
+                <TableCell align="center">
                   <IconButton
                     onClick={(event) => {
                       handleOpen(event, row.id);

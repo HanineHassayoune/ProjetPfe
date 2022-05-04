@@ -28,6 +28,8 @@ import ListAltIcon from "@mui/icons-material/ListAlt";
 import AddBusinessIcon from "@mui/icons-material/AddBusiness";
 import LogoutIcon from "@mui/icons-material/Logout";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import { logOut } from "../controleurs/CompteControleur";
+import Logout from "@mui/icons-material/Logout";
 const drawerWidth = 240;
 
 const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
@@ -259,7 +261,12 @@ export default function Menu({ children }) {
           <ListItemText primary={"Modifier compte"} />
         </ListItem>
 
-        <ListItem button>
+        <ListItem
+          button
+          onClick={() => {
+            navigate("/connexion");
+          }}
+        >
           <ListItemIcon>
             <LogoutIcon color="primary" />
           </ListItemIcon>

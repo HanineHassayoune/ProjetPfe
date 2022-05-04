@@ -16,11 +16,78 @@ import { ArticleModel } from "../Models/ArticleModel";
 import { styled } from "@mui/material/styles";
 import { storage } from "../Helpers/FireBase";
 import { createUUID } from "../Helpers/Helper";
+import MenuItem from "@mui/material/MenuItem";
+import CircularProgress from "@mui/material/CircularProgress";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import moment from "moment";
+
+const status = [
+  {
+    value: "Disponible",
+    label: "Disponible",
+  },
+  {
+    value: "Reservé",
+    label: "Reservé",
+  },
+  {
+    value: "Retiré",
+    label: "Retiré",
+  },
+  {
+    value: "Perimé",
+    label: "Perimé",
+  },
+];
+const Unite = [
+  {
+    value: "Kg",
+    label: "Kg",
+  },
+  {
+    value: "g",
+    label: "g",
+  },
+  {
+    value: "L",
+    label: "L",
+  },
+  {
+    value: "ml",
+    label: "ml",
+  },
+  {
+    value: "cl",
+    label: "cl",
+  },
+  {
+    value: "Autre",
+    label: "Autre",
+  },
+];
 
 export default function ModifierArticle() {
-  let { id } = useParams();
-  console.log(id);
   const [data, setData] = useState({
+    titreArticle: "",
+    urlImage: "",
+    nomPointVente: "",
+    idPointVente: "",
+    nomCommercant: "",
+    prixInitial: "",
+    prixActuel: "",
+    unite: "",
+    quantite: "",
+    datevalidite: "",
+    dateretrait: "",
+    statut: "",
+    description: "",
+  });
+  const [loading, setLoading] = useState(true);
+  const [dateV, setDateV] = useState(null);
+  const [dateR, setDateR] = useState(null);
+  const [errors, setErrors] = useState({
     titreArticle: "",
     urlImage: "",
     nomPointVente: "",
@@ -34,8 +101,10 @@ export default function ModifierArticle() {
     statut: "",
     description: "",
   });
+  const Input = styled("input")({
+    display: "none",
+  });
 
-  const [loading, setLoading] = useState(true);
   useEffect(() => {
     console.log("use effect here ");
     getArticleById(id)
@@ -49,6 +118,7 @@ export default function ModifierArticle() {
           values.titreArticle,
           values.urlImage,
           values.nomPointVente,
+          values.idPointVente,
           values.nomCommercant,
           values.prixInitial,
           values.prixActuel,
@@ -66,6 +136,9 @@ export default function ModifierArticle() {
       });
   }, []);
 
+  let { id } = useParams();
+  console.log(id);
+
   //modifier article
   const modifierArticle = (data) => {
     updateArticle(data)
@@ -78,27 +151,10 @@ export default function ModifierArticle() {
   };
 
   const theme = createTheme();
-  const [errors, setErrors] = useState({
-    titreArticle: "",
-    urlImage: "",
-    nomPointVente: "",
-    nomCommercant: "",
-    prixInitial: "",
-    prixActuel: "",
-    quantite: "",
-    unite: "",
-    datevalidite: "",
-    dateretrait: "",
-    statut: "",
-    description: "",
-  });
 
   //validation formulaire
   const regNum = new RegExp("^[0-9\b]+$");
   const regNom = new RegExp("^[a-zA-Z]+[a-zA-Z]+$");
-  const regDate = new RegExp(
-    "^([0]?[1-9]|[1|2][0-9]|[3][0|1])[./-]([0]?[1-9]|[1][0-2])[./-]([0-9]{4}|[0-9]{2})$"
-  );
 
   const isFormValid = (data) => {
     const _errors = { ...errors };
@@ -140,20 +196,14 @@ export default function ModifierArticle() {
 
     if (!data.unite) {
       _errors.unite = "Unité est obligatoire";
-    } else if (!regNom.test(data.unite)) {
-      _errors.unite = "Unite contient uniquement des lettres ";
     } else _errors.unite = "";
 
     if (!data.datevalidite) {
       _errors.datevalidite = "Date de validité est obligatoire";
-    } else if (!regDate.test(data.datevalidite)) {
-      _errors.datevalidite = "Date de validité est jj.mm.aaaa ou jj/mm/aaaa  ";
     } else _errors.datevalidite = "";
 
     if (!data.dateretrait) {
       _errors.dateretrait = "Date de retrait est obligatoire";
-    } else if (!regDate.test(data.dateretrait)) {
-      _errors.dateretrait = "Date du retrait est jj.mm.aaaa ou jj/mm/aaaa  ";
     } else _errors.dateretrait = "";
 
     if (!data.statut) {
@@ -179,9 +229,6 @@ export default function ModifierArticle() {
       modifierArticle(data);
     } else console.log("form nom valid");
   };
-  const Input = styled("input")({
-    display: "none",
-  });
 
   const handleChange = (event) => {
     //a faire pour tout les champs dans le formulaire==>ligne 178
@@ -242,7 +289,15 @@ export default function ModifierArticle() {
   return (
     <>
       {loading ? (
-        <>"is loading" </>
+        <>
+          <Typography
+            variant="h4"
+            color="primary"
+            sx={{ fontFamily: "cursive" }}
+          >
+            Loading <CircularProgress />
+          </Typography>
+        </>
       ) : (
         <>
           <ThemeProvider theme={theme}>
@@ -297,7 +352,8 @@ export default function ModifierArticle() {
                         autoComplete="nomPointVente"
                         error={errors.nomPointVente ? true : false}
                         helperText={errors.nomPointVente}
-                        onChange={(e) => handleChange(e)}
+                        disabled
+                        //onChange={(e) => handleChange(e)}
                         value={data.nomPointVente}
                       />
                     </Grid>
@@ -362,9 +418,16 @@ export default function ModifierArticle() {
                         autoComplete="unite"
                         error={errors.unite ? true : false}
                         helperText={errors.unite}
+                        select
                         onChange={(e) => handleChange(e)}
                         value={data.unite}
-                      />
+                      >
+                        {Unite.map((option) => (
+                          <MenuItem key={option.value} value={option.value}>
+                            {option.label}
+                          </MenuItem>
+                        ))}
+                      </TextField>
                     </Grid>
 
                     <Grid item xs={12} sm={6}>
@@ -385,7 +448,7 @@ export default function ModifierArticle() {
                     </Grid>
 
                     <Grid item xs={12} sm={6}>
-                      <TextField
+                      {/* <TextField
                         margin="normal"
                         required
                         fullWidth
@@ -398,11 +461,23 @@ export default function ModifierArticle() {
                         helperText={errors.datevalidite}
                         onChange={(e) => handleChange(e)}
                         value={data.datevalidite}
-                      />
+                        />*/}
+                      <LocalizationProvider dateAdapter={AdapterDateFns}>
+                        <DatePicker
+                          label="Date de validité"
+                          value={dateV}
+                          onChange={(newDateV) => {
+                            setDateV(newDateV);
+                          }}
+                          renderInput={(params) => (
+                            <TextField {...params} value={data.datevalidite} />
+                          )}
+                        />
+                      </LocalizationProvider>
                     </Grid>
 
                     <Grid item xs={12} sm={6}>
-                      <TextField
+                      {/*<TextField
                         margin="normal"
                         required
                         fullWidth
@@ -415,7 +490,17 @@ export default function ModifierArticle() {
                         helperText={errors.dateretrait}
                         onChange={(e) => handleChange(e)}
                         value={data.dateretrait}
-                      />
+                        />*/}
+                      <LocalizationProvider dateAdapter={AdapterDateFns}>
+                        <DatePicker
+                          label="Date du retrait"
+                          value={dateR}
+                          onChange={(newDateR) => {
+                            setDateR(newDateR);
+                          }}
+                          renderInput={(params) => <TextField {...params} />}
+                        />
+                      </LocalizationProvider>
                     </Grid>
 
                     <Grid item xs={12}>
@@ -430,9 +515,16 @@ export default function ModifierArticle() {
                         autoComplete="statut"
                         error={errors.statut ? true : false}
                         helperText={errors.statut}
+                        select
                         onChange={(e) => handleChange(e)}
                         value={data.statut}
-                      />
+                      >
+                        {status.map((option) => (
+                          <MenuItem key={option.value} value={option.value}>
+                            {option.label}
+                          </MenuItem>
+                        ))}
+                      </TextField>
                     </Grid>
 
                     <Grid item xs={12}>

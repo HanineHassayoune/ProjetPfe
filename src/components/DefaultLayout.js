@@ -10,6 +10,7 @@ import ModifierPointVente from "../pages/ModifierPointVente";
 import Menu from "../pages/Menu";
 import ModifierCompte from "../pages/ModifierCompte";
 import Detail from "../pages/Detail";
+import Date from "../pages/Date";
 
 function DefaultLayout() {
   return (
@@ -40,6 +41,7 @@ function DefaultLayout() {
         ></Route>
         <Route path="/modifier/compte" element={<ModifierCompte />}></Route>
         <Route path="/detail/:id" element={<Detail />}></Route>
+        <Route path="/date" element={<Date />}></Route>
       </Routes>
     </Menu>
   );

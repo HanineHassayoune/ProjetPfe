@@ -5,6 +5,7 @@ export class ArticleModel {
     titreArticle,
     urlImage,
     nomPointVente,
+    idPointVente,
     nomCommercant,
     prixInitial,
     prixActuel,
@@ -20,6 +21,7 @@ export class ArticleModel {
     this.titreArticle = titreArticle;
     this.urlImage = urlImage;
     this.nomPointVente = nomPointVente;
+    this.idPointVente = idPointVente;
     this.nomCommercant = nomCommercant;
     this.prixInitial = prixInitial;
     this.prixActuel = prixActuel;

@@ -10,8 +10,10 @@ import Grid from "@mui/material/Grid";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { useFormControl } from "@mui/material";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getUserById, login } from "../controleurs/CompteControleur";
+import { CompteModel } from "../Models/CompteModel";
+import { useNavigate } from "react-router-dom";
 
 const theme = createTheme();
 
@@ -20,6 +22,7 @@ export default function Connexion() {
     email: "",
     password: "",
   });
+  const navigate = useNavigate();
   // validation formulaire
   const pattern = new RegExp("^[a-zA-Z0-9]+@[a-zA-Z0-9]+.[A-Za-z]+$");
   const isFormValid = (data) => {
@@ -46,8 +49,12 @@ export default function Connexion() {
 
     //return Object.values(_errors).filter((item) => item).length === 0;
   };
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+  });
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const dataValues = {
@@ -55,11 +62,24 @@ export default function Connexion() {
       password: data.get("password"),
     };
 
-    if (isFormValid(dataValues)) {
+    /*if (isFormValid(dataValues)) {
       console.log("form valid");
+      await login(form);
     } else {
       console.log("form non valid");
-    }
+    }*/
+
+    let user = await login(form);
+    console.log("user", user);
+    console.log(" user.id", user.uid);
+    let _user = await getUserById(user.uid);
+    if (_user.exists) {
+      _user.data();
+      console.log("_user", _user.data());
+      navigate("/statistique");
+    } else console.log("user n'existe pas");
+
+    //methode -->get user by id (id) -->return element :commercant (page statistic)sinon: autre type d'utilisateur(errer) + log out
   };
 
   return (
@@ -112,6 +132,7 @@ export default function Connexion() {
                 error={errors.email ? true : false}
                 helperText={errors.email}
                 autoFocus
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
               />
 
               <TextField
@@ -125,6 +146,7 @@ export default function Connexion() {
                 autoComplete="current-password"
                 error={errors.password ? true : false}
                 helperText={errors.password}
+                onChange={(e) => setForm({ ...form, password: e.target.value })}
               />
 
               <Button

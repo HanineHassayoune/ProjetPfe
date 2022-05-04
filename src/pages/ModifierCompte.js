@@ -7,7 +7,7 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import StorefrontIcon from "@mui/icons-material/Storefront";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function ModifierPointVente() {
   const [data, setData] = useState({
@@ -63,9 +63,9 @@ export default function ModifierPointVente() {
     event.preventDefault();
     console.log(data);
 
-    if (isFormValid(data)) {
+    /* if (isFormValid(data)) {
       console.log("form valid");
-    } else console.log("form non valid");
+    } else console.log("form non valid");*/
   };
 
   return (

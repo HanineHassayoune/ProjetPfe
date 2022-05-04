@@ -5,7 +5,7 @@ import "firebase/firestore";
 import "firebase/storage";
 import "firebase/analytics";
 import firebase from "firebase/app";
-import "firebase/storage";
+import "firebase/auth";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -25,5 +25,7 @@ export { db };
 //var storageRef = firebase.storage().ref();
 //const storage = firebase.storage();
 const storage = firebase.storage();
-
 export { storage };
+
+export const auth = firebase.auth();
+export const user = firebase.auth().currentUser;

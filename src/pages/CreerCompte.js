@@ -12,6 +12,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { useState } from "react";
 import { creerCompte } from "../controleurs/CompteControleur";
 import Link from "@mui/material/Link";
+import { register } from "../controleurs/CompteControleur";
 const theme = createTheme();
 
 export default function CreerCompte() {
@@ -54,28 +55,42 @@ export default function CreerCompte() {
     } else return false;
   };
 
-  const handleSubmit = (event) => {
+  const [form, setForm] = useState({
+    nom: "",
+    prenom: "",
+    email: "",
+    password: "",
+  });
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const dataValues = {
       nom: data.get("nom"),
       prenom: data.get("prenom"),
       email: data.get("email"),
-      password: data.get("password"),
     };
-    if (isFormValid(dataValues)) {
+
+   /* if (isFormValid(dataValues)) {
       console.log("form valid");
-      creerCompte(dataValues)
-        .then(() => {
+      await register(form);
+    await creerCompte(dataValues);
+    } else {
+      console.log("form non valid");
+    }*/
+
+    
+    await register(form);
+    await creerCompte(dataValues);
+
+    /*creerCompte(dataValues);
+      .then(() => {
           console.log("compte est ajouté");
           console.log("______ ", dataValues);
         })
         .catch(() => {
           console.log("something went wrong !! ");
-        });
-    } else {
-      console.log("form non valid");
-    }
+        });*/
   };
 
   return (
@@ -152,6 +167,7 @@ export default function CreerCompte() {
                 error={errors.email ? true : false}
                 helperText={errors.email}
                 autoComplete="email"
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
               />
               <TextField
                 margin="normal"
@@ -161,9 +177,10 @@ export default function CreerCompte() {
                 label="Mots de passe"
                 type="password"
                 id="password"
-                error={errors.password ? true : false}
-                helperText={errors.password}
+                //error={errors.password ? true : false}
+                //helperText={errors.password}
                 autoComplete="current-password"
+                onChange={(e) => setForm({ ...form, password: e.target.value })}
               />
 
               <Button

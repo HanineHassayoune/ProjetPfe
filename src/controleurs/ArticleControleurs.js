@@ -13,6 +13,7 @@ export function ajouterArticle(data) {
     data.titreArticle,
     data.urlImage,
     data.nomPointVente,
+    data.idPointVente,
     data.nomCommercant,
     data.prixInitial,
     data.prixActuel,
@@ -55,3 +56,17 @@ export function updateArticle(data) {
   // return storageRef.child('images/mountains.jpg');
 }
 */
+//let LeftList = snapshot.docs.map((doc) => doc.data());
+export function getListArticlesFromPtvByListId(listIdArticles) {
+  if (listIdArticles.length === 0) return Promise.all([]);
+  return db
+    .collection("Articles")
+    .where("id", "in", listIdArticles)
+    .get()
+    .then((snapshot) => {
+      let LeftList = snapshot.docs.map((doc) => doc.data());
+      return LeftList;
+    });
+  // var docRef = db.collection("Articles").where("id", "in", listIdArticles);
+  // return docRef.get();
+}

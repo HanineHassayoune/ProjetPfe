@@ -1,12 +1,15 @@
 import { db } from "../Helpers/FireBase";
 import { PointDeVenteModel } from "../Models/PointDeVenteModel";
+import firebase from "firebase";
 
 export function ajouterPointVente(data) {
   let docRef = db.collection("PointsDeVente").doc();
   let PointVenteId = docRef.id;
   data.id = PointVenteId;
+  let idArticles = [];
   let pointVenteToAdd = new PointDeVenteModel(
     PointVenteId,
+    idArticles,
     data.titrePointVente,
     data.adressePointVente,
     data.email,
@@ -34,4 +37,16 @@ export function getPointsVenteById(id) {
 export function updatePointsVente(data) {
   var docRef = db.collection("PointsDeVente");
   return docRef.doc(data.id).update(data);
+}
+export function setIdArticlesToPointVente(idPointVente, listIdArticles) {
+  var docRef = db.collection("PointsDeVente").doc(idPointVente);
+  return docRef.update({
+    idArticles: firebase.firestore.FieldValue.arrayUnion(...listIdArticles),
+  });
+}
+export function deleteIdArticlesToPointVente(idPointVente, listIdArticles) {
+  var docRef = db.collection("PointsDeVente").doc(idPointVente);
+  return docRef.update({
+    idArticles: firebase.firestore.FieldValue.arrayRemove(...listIdArticles),
+  });
 }
