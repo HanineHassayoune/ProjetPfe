@@ -67,10 +67,32 @@ const Unite = [
     label: "Autre",
   },
 ];
-
+const TypesArticle = [
+  {
+    value: "fruit",
+    label: "fruit",
+  },
+  {
+    value: "legume",
+    label: "legume",
+  },
+  {
+    value: "aliments",
+    label: "aliments",
+  },
+  {
+    value: "sucré",
+    label: "sucré",
+  },
+  {
+    value: "panier",
+    label: "panier",
+  },
+];
 export default function ModifierArticle() {
   const [data, setData] = useState({
     titreArticle: "",
+    typeArticle: "",
     urlImage: "",
     nomPointVente: "",
     idPointVente: "",
@@ -89,6 +111,7 @@ export default function ModifierArticle() {
   const [dateR, setDateR] = useState(null);
   const [errors, setErrors] = useState({
     titreArticle: "",
+    typeArticle: "",
     urlImage: "",
     nomPointVente: "",
     nomCommercant: "",
@@ -101,6 +124,7 @@ export default function ModifierArticle() {
     statut: "",
     description: "",
   });
+  const [typeArticle, setTypeArticle] = useState("");
   const Input = styled("input")({
     display: "none",
   });
@@ -116,6 +140,7 @@ export default function ModifierArticle() {
           values.id,
           values.idCommercant,
           values.titreArticle,
+          values.typeArticle,
           values.urlImage,
           values.nomPointVente,
           values.idPointVente,
@@ -324,7 +349,7 @@ export default function ModifierArticle() {
                   sx={{ mt: 1 }}
                 >
                   <Grid container spacing={2}>
-                    <Grid item xs={12}>
+                    <Grid item xs={12} sm={6}>
                       <TextField
                         margin="normal"
                         required
@@ -339,6 +364,28 @@ export default function ModifierArticle() {
                         onChange={(e) => handleChange(e)}
                         autoFocus
                       />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        id="typeArticle"
+                        label="Type article"
+                        autoComplete="typeArticle"
+                        //error={errors.typeArticle ? true : false}
+                        //helperText={errors.typeArticle}
+                        value={data.typeArticle}
+                        name="typeArticle"
+                        onChange={(e) => handleChange(e)}
+                        select
+                      >
+                        {TypesArticle.map((option) => (
+                          <MenuItem key={option.value} value={option.value}>
+                            {option.label}
+                          </MenuItem>
+                        ))}
+                      </TextField>
                     </Grid>
 
                     <Grid item xs={12} sm={6}>
@@ -366,7 +413,8 @@ export default function ModifierArticle() {
                         id="nomCommercant"
                         label="Nom commerçant"
                         name="nomCommercant"
-                        autoComplete="nomCommercant"
+                        //autoComplete="nomCommercant"
+                        disabled
                         error={errors.nomCommercant ? true : false}
                         helperText={errors.nomCommercant}
                         onChange={(e) => handleChange(e)}
@@ -563,6 +611,8 @@ export default function ModifierArticle() {
                   <img
                     src={`${data.urlImage}?w=164&h=164&fit=crop&auto=format`}
                     loading="lazy"
+                    width="400"
+                    height="200"
                   />
 
                   <Button

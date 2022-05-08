@@ -19,36 +19,6 @@ import ReportProblemIcon from "@mui/icons-material/ReportProblem";
 import { consulterListeArticles } from "../controleurs/ArticleControleurs";
 import { deleteArticle } from "../controleurs/ArticleControleurs";
 
-/*function createData(
-  id,
-  titreArticle,
-  nomPointVente,
-  nomCommercant,
-  prixinitial,
-  prixactuactuel,
-  unite,
-  quantite,
-  datevalidite,
-  dateretrait,
-  statut,
-  description
-) {
-  return {
-    id,
-    titreArticle,
-    nomPointVente,
-    nomCommercant,
-    prixinitial,
-    prixactuactuel,
-    unite,
-    quantite,
-    datevalidite,
-    dateretrait,
-    statut,
-    description,
-  };
-}*/
-
 //conposant react
 export default function ConsulterArticles() {
   const style = {
@@ -100,22 +70,6 @@ export default function ConsulterArticles() {
   const handleClose = () => setOpen(false);
   const navigate = useNavigate();
 
-  /*const rows = [
-    createData(
-      "Produit 2",
-      "BBBB",
-      "Mohamed",
-      "237",
-      "9.0",
-      "2",
-      "L",
-      "28/03/2022",
-      "20/03/2022",
-      "disponible",
-      "kgfjhoirfjoi"
-    ),
-  ];*/
-
   return (
     <div>
       <TableContainer component={Paper}>
@@ -123,10 +77,16 @@ export default function ConsulterArticles() {
           <TableHead>
             <TableRow>
               <TableCell align="center" bgcolor="#e3f2fd">
+                Image article
+              </TableCell>
+              <TableCell align="center" bgcolor="#e3f2fd">
                 Id article
               </TableCell>
               <TableCell align="center" bgcolor="#e3f2fd">
                 Titre article
+              </TableCell>
+              <TableCell align="center" bgcolor="#e3f2fd">
+                Type article
               </TableCell>
               <TableCell align="center" bgcolor="#e3f2fd">
                 Nom point vente
@@ -169,13 +129,12 @@ export default function ConsulterArticles() {
                 key={id}
                 sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
               >
-                {/*<TableCell component="th" scope="row">
-                  {row.id}
-            </TableCell>*/}
-                <TableCell align="right" bgcolor="#e3f2fd">
-                  {row.id}
+                <TableCell align="center">
+                  <img src={row.urlImage} width="100" height="60" />
                 </TableCell>
+                <TableCell align="center">{row.id}</TableCell>
                 <TableCell align="center">{row.titreArticle}</TableCell>
+                <TableCell align="center">{row.typeArticle}</TableCell>
                 <TableCell align="center">{row.nomPointVente}</TableCell>
                 <TableCell align="center">{row.nomCommercant}</TableCell>
                 <TableCell align="center">{row.prixInitial}</TableCell>

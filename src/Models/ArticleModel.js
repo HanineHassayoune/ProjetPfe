@@ -3,6 +3,7 @@ export class ArticleModel {
     id,
     idCommercant,
     titreArticle,
+    typeArticle,
     urlImage,
     nomPointVente,
     idPointVente,
@@ -19,6 +20,7 @@ export class ArticleModel {
     this.id = id;
     this.idCommercant = idCommercant;
     this.titreArticle = titreArticle;
+    this.typeArticle = typeArticle;
     this.urlImage = urlImage;
     this.nomPointVente = nomPointVente;
     this.idPointVente = idPointVente;

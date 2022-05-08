@@ -3,14 +3,18 @@ import { ArticleModel } from "../Models/ArticleModel";
 import { storage } from "../Helpers/FireBase";
 
 export function ajouterArticle(data) {
+  let localUser = localStorage.getItem("connected_user");
+  const jsonUser = JSON.parse(localUser);
+  //console.log("Test", jsonUser);
   let docRef = db.collection("Articles").doc();
   let articleId = docRef.id;
   data.id = articleId;
-  let idCommercant = "123";
+  let idCommercant = jsonUser.id;
   let articleToAdd = new ArticleModel(
     articleId,
     idCommercant,
     data.titreArticle,
+    data.typeArticle,
     data.urlImage,
     data.nomPointVente,
     data.idPointVente,

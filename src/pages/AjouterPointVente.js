@@ -7,21 +7,100 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import StorefrontIcon from "@mui/icons-material/Storefront";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ajouterPointVente } from "../controleurs/PointDeVenteControleur";
 import Alert from "@mui/material/Alert";
 import AlertTitle from "@mui/material/AlertTitle";
 import { useNavigate } from "react-router-dom";
-
+import CircularProgress from "@mui/material/CircularProgress";
+import { getUserById } from "../controleurs/CompteControleur";
+import { CompteModel } from "../Models/CompteModel";
+import { storage } from "../Helpers/FireBase";
+import { createUUID } from "../Helpers/Helper";
+import { Grid } from "@mui/material";
+import { styled } from "@mui/material/styles";
 const theme = createTheme();
 
 export default function AjouterPointVente() {
+  const [loading, setLoading] = useState(true);
+  const [url, setUrl] = useState("");
+  const [progress, setProgress] = useState(0);
+  const [image, setImage] = useState(null);
   const [errors, setErrors] = useState({
     titrePointVente: "",
     email: "",
     adressePointVente: "",
     numerotlf: "",
   });
+  const Input = styled("input")({
+    display: "none",
+  });
+  const [user, setUser] = useState({
+    id: "",
+    nom: "",
+    prenom: "",
+    email: "",
+  });
+  useEffect(() => {
+    console.log("use effect here");
+    let localUser = localStorage.getItem("connected_user");
+    const jsonUser = JSON.parse(localUser);
+    console.log("jsonUser", jsonUser);
+    getUserById(jsonUser.id)
+      .then((snapshot) => {
+        let values = snapshot.data();
+        setLoading(false);
+        const compte = new CompteModel(
+          values.id,
+          values.nom,
+          values.prenom,
+          values.email
+        );
+        setUser(compte);
+        console.log("compteUser", compte);
+      })
+      .catch((error) => {
+        console.error("Error : ", error);
+      });
+  }, []);
+  const handleChangeImagePtv = (e) => {
+    if (e.target.files[0]) {
+      setImage(e.target.files[0]);
+      console.log("image", e.target.files[0]);
+      handleUpload(e.target.files[0]);
+    }
+  };
+
+  const handleUpload = (_image) => {
+    let imageName = createUUID() + _image.name;
+    const uploadTask = storage.ref(`images/${imageName}`).put(_image);
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        const progress = Math.round(
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+        );
+        setProgress(progress);
+      },
+      (error) => {
+        console.log(error);
+      },
+      () => {
+        storage
+          .ref("images")
+          .child(imageName)
+          .getDownloadURL()
+          .then((url) => {
+            setUrl(url);
+            console.log(url);
+          })
+          .catch((error) => {
+            console.log(" !! ", error);
+          });
+      }
+    );
+  };
+
   const navigate = useNavigate();
   const pattern = new RegExp("^[a-zA-Z0-9]+@[a-zA-Z0-9]+[.][A-Za-z]+$");
   const regNom = new RegExp("^[a-zA-Z]+[a-zA-Z]+$");
@@ -64,9 +143,10 @@ export default function AjouterPointVente() {
     const data = new FormData(event.currentTarget);
     const dataValues = {
       titrePointVente: data.get("titrePointVente"),
-      email: data.get("email"),
+      email: user.email,
       adressePointVente: data.get("adressePointVente"),
       numerotlf: data.get("numerotlf"),
+      urlImagePtv: url,
     };
     if (isFormValid(dataValues)) {
       console.log("form valid");
@@ -84,90 +164,138 @@ export default function AjouterPointVente() {
   };
 
   return (
-    <ThemeProvider theme={theme}>
-      <Container component="main" maxWidth="xs">
-        <CssBaseline />
-        <Box
-          sx={{
-            marginTop: 5,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
-        >
-          <Avatar sx={{ m: 1, bgcolor: "primary.main" }}>
-            <StorefrontIcon />
-          </Avatar>
-          <Typography component="h1" variant="h5">
-            Nouveau point vente
-          </Typography>
-          <Box
-            component="form"
-            onSubmit={handleSubmit}
-            noValidate
-            sx={{ mt: 1 }}
+    <>
+      {loading ? (
+        <>
+          <Typography
+            variant="h4"
+            color="primary"
+            sx={{ fontFamily: "cursive" }}
           >
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="titrePointVente"
-              label="Titre point vente"
-              name="titrePointVente"
-              autoComplete="titrePointVente"
-              error={errors.titrePointVente ? true : false}
-              helperText={errors.titrePointVente}
-              autoFocus
-            />
-
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="adressePointVente"
-              label="Adresse point vente"
-              name="adressePointVente"
-              error={errors.adressePointVente ? true : false}
-              helperText={errors.adressePointVente}
-              autoComplete="adressePointVente"
-            />
-
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="email"
-              label="Email"
-              type="email"
-              id="email"
-              error={errors.email ? true : false}
-              helperText={errors.email}
-              autoComplete="email"
-            />
-
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="numerotlf"
-              label="Numéro téléphone"
-              name="numerotlf"
-              error={errors.numerotlf ? true : false}
-              helperText={errors.numerotlf}
-              autoComplete="numerotlf"
-            />
-
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-            >
-              Ajouter
-            </Button>
-          </Box>
-        </Box>
-      </Container>
-    </ThemeProvider>
+            Loading <CircularProgress />
+          </Typography>
+        </>
+      ) : (
+        <>
+          <ThemeProvider theme={theme}>
+            <Container component="main" maxWidth="xs">
+              <CssBaseline />
+              <Box
+                sx={{
+                  marginTop: 5,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                }}
+              >
+                <Avatar sx={{ m: 1, bgcolor: "primary.main" }}>
+                  <StorefrontIcon />
+                </Avatar>
+                <Typography component="h1" variant="h5">
+                  Nouveau point vente
+                </Typography>
+                <Box
+                  component="form"
+                  onSubmit={handleSubmit}
+                  noValidate
+                  sx={{ mt: 1 }}
+                >
+                  <Grid container spacing={2}>
+                    <Grid item xs={12}>
+                      <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        id="titrePointVente"
+                        label="Titre point vente"
+                        name="titrePointVente"
+                        autoComplete="titrePointVente"
+                        error={errors.titrePointVente ? true : false}
+                        helperText={errors.titrePointVente}
+                        autoFocus
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        id="adressePointVente"
+                        label="Adresse point vente"
+                        name="adressePointVente"
+                        error={errors.adressePointVente ? true : false}
+                        helperText={errors.adressePointVente}
+                        autoComplete="adressePointVente"
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        name="email"
+                        label="Email"
+                        type="email"
+                        id="email"
+                        error={errors.email ? true : false}
+                        helperText={errors.email}
+                        // autoComplete="email"
+                        disabled
+                        value={user.email}
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        id="numerotlf"
+                        label="Numéro téléphone"
+                        name="numerotlf"
+                        error={errors.numerotlf ? true : false}
+                        helperText={errors.numerotlf}
+                        autoComplete="numerotlf"
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <label htmlFor="contained-button-file">
+                        <Input
+                          accept="image/*"
+                          id="contained-button-file"
+                          multiple
+                          type="file"
+                          onChange={handleChangeImagePtv}
+                        />
+                        <Button variant="contained" component="span" fullWidth>
+                          Télécharger image
+                        </Button>
+                      </label>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <img
+                        src={`${url}?w=164&h=164&fit=crop&auto=format`}
+                        loading="lazy"
+                        width="400"
+                        height="200"
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Button
+                        type="submit"
+                        fullWidth
+                        variant="contained"
+                        sx={{ mt: 3, mb: 2 }}
+                      >
+                        Ajouter
+                      </Button>
+                    </Grid>
+                  </Grid>
+                </Box>
+              </Box>
+            </Container>
+          </ThemeProvider>
+        </>
+      )}
+    </>
   );
 }

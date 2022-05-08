@@ -13,7 +13,8 @@ export function ajouterPointVente(data) {
     data.titrePointVente,
     data.adressePointVente,
     data.email,
-    data.numerotlf
+    data.numerotlf,
+    data.urlImagePtv
   );
   console.log(pointVenteToAdd);
   return docRef.set(Object.assign({}, pointVenteToAdd));

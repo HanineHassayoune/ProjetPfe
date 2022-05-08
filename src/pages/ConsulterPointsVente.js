@@ -77,6 +77,9 @@ export default function ConsulterPointsVente() {
           <TableHead>
             <TableRow>
               <TableCell align="center" bgcolor="#e3f2fd">
+                Image point vente
+              </TableCell>
+              <TableCell align="center" bgcolor="#e3f2fd">
                 Id point vente
               </TableCell>
               <TableCell align="center" bgcolor="#e3f2fd">
@@ -102,9 +105,10 @@ export default function ConsulterPointsVente() {
                 key={id}
                 sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
               >
-                <TableCell align="center" bgcolor="#e3f2fd">
-                  {row.id}
+                <TableCell align="center">
+                  <img src={row.urlImagePtv} width="100" height="60" />
                 </TableCell>
+                <TableCell align="center">{row.id}</TableCell>
                 <TableCell align="center">{row.titrePointVente}</TableCell>
                 <TableCell align="center">{row.adressePointVente}</TableCell>
                 <TableCell align="center">{row.email}</TableCell>

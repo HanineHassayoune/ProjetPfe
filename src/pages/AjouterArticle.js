@@ -24,6 +24,9 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
+import { getUserFromLocalStorage } from "../controleurs/CompteControleur";
+import { getUserById } from "../controleurs/CompteControleur";
+import { CompteModel } from "../Models/CompteModel";
 
 const status = [
   {
@@ -70,8 +73,31 @@ const Unite = [
   },
 ];
 
+const TypesArticle = [
+  {
+    value: "fruit",
+    label: "fruit",
+  },
+  {
+    value: "legume",
+    label: "legume",
+  },
+  {
+    value: "aliments",
+    label: "aliments",
+  },
+  {
+    value: "sucré",
+    label: "sucré",
+  },
+  {
+    value: "panier",
+    label: "panier",
+  },
+];
 export default function Ajouter() {
   const [statutArticle, setStatutArticle] = useState("");
+  const [typeArticle, setTypeArticle] = useState("");
   const [uniteArticle, setUniteArticle] = useState("");
   const [ptv, setPtv] = useState({
     idPointVente: "",
@@ -82,8 +108,10 @@ export default function Ajouter() {
   const [image, setImage] = useState(null);
   const [url, setUrl] = useState("");
   const [progress, setProgress] = useState(0);
+
   const [errors, setErrors] = useState({
     titreArticle: "",
+    typeArticle: "",
     nomPointVente: "",
     nomCommercant: "",
     prixInitial: "",
@@ -100,9 +128,19 @@ export default function Ajouter() {
   const Input = styled("input")({
     display: "none",
   });
+  const [user, setUser] = useState({
+    id: "",
+    nom: "",
+    prenom: "",
+    email: "",
+  });
   const theme = createTheme();
   const navigate = useNavigate();
-
+  /* let localUser = localStorage.getItem("connected_user");
+  const jsonUser = JSON.parse(localUser);
+  console.log("Test", jsonUser);
+  const [user, setUser] = useState(jsonUser);
+  console.log("user here", user);*/
   useEffect(() => {
     console.log("use effect here");
     consulterListePointsVente().then((snapshot) => {
@@ -120,7 +158,26 @@ export default function Ajouter() {
 
       console.log("listPTV  :", listPTV);
     });
-    console.log("message");
+
+    let localUser = localStorage.getItem("connected_user");
+    const jsonUser = JSON.parse(localUser);
+    console.log("jsonUser", jsonUser);
+    getUserById(jsonUser.id)
+      .then((snapshot) => {
+        let values = snapshot.data();
+        setLoading(false);
+        const compte = new CompteModel(
+          values.id,
+          values.nom,
+          values.prenom,
+          values.email
+        );
+        setUser(compte);
+        console.log("compteUser", compte);
+      })
+      .catch((error) => {
+        console.error("Error : ", error);
+      });
   }, []);
 
   const handleChange = (event) => {
@@ -128,6 +185,9 @@ export default function Ajouter() {
   };
   const handleChangeUnite = (event) => {
     setUniteArticle(event.target.value);
+  };
+  const handleChangeTypeArticle = (event) => {
+    setTypeArticle(event.target.value);
   };
 
   const handleChangePtv = (event) => {
@@ -258,10 +318,11 @@ export default function Ajouter() {
 
     const dataValues = {
       titreArticle: data.get("titreArticle"),
+      typeArticle: data.get("typeArticle"),
       urlImage: url,
       nomPointVente: ptv.nomPointVente,
       idPointVente: ptv.idPointVente,
-      nomCommercant: data.get("nomCommercant"),
+      nomCommercant: user.prenom,
       prixInitial: data.get("prixInitial"),
       prixActuel: data.get("prixActuel"),
       unite: data.get("unite"),
@@ -326,7 +387,7 @@ export default function Ajouter() {
                   sx={{ mt: 1 }}
                 >
                   <Grid container spacing={2}>
-                    <Grid item xs={12}>
+                    <Grid item xs={12} sm={6}>
                       <TextField
                         margin="normal"
                         required
@@ -340,7 +401,28 @@ export default function Ajouter() {
                         autoFocus
                       />
                     </Grid>
-
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        id="typeArticle"
+                        label="Type article"
+                        name="typeArticle"
+                        autoComplete="typeArticle"
+                        // error={errors.typeArticle ? true : false}
+                        // helperText={errors.typeArticle}
+                        select
+                        value={typeArticle}
+                        onChange={handleChangeTypeArticle}
+                      >
+                        {TypesArticle.map((option) => (
+                          <MenuItem key={option.value} value={option.value}>
+                            {option.label}
+                          </MenuItem>
+                        ))}
+                      </TextField>
+                    </Grid>
                     <Grid item xs={12} sm={6}>
                       <TextField
                         margin="normal"
@@ -363,21 +445,20 @@ export default function Ajouter() {
                         ))}
                       </TextField>
                     </Grid>
-
                     <Grid item xs={12} sm={6}>
                       <TextField
                         margin="normal"
                         required
                         fullWidth
                         id="nomCommercant"
-                        label="Nom commerçant"
                         name="nomCommercant"
-                        autoComplete="nomCommercant"
+                        //autoComplete="nomCommercant"
                         error={errors.nomCommercant ? true : false}
                         helperText={errors.nomCommercant}
+                        value={user.prenom}
+                        disabled
                       />
                     </Grid>
-
                     <Grid item xs={12} sm={6}>
                       <TextField
                         margin="normal"
@@ -391,7 +472,6 @@ export default function Ajouter() {
                         helperText={errors.prixInitial}
                       />
                     </Grid>
-
                     <Grid item xs={12} sm={6}>
                       <TextField
                         margin="normal"
@@ -405,7 +485,6 @@ export default function Ajouter() {
                         helperText={errors.prixActuel}
                       />
                     </Grid>
-
                     <Grid item xs={12} sm={6}>
                       <TextField
                         margin="normal"
@@ -429,7 +508,6 @@ export default function Ajouter() {
                         ))}
                       </TextField>
                     </Grid>
-
                     <Grid item xs={12} sm={6}>
                       <TextField
                         margin="normal"
@@ -444,7 +522,6 @@ export default function Ajouter() {
                         helperText={errors.quantite}
                       />
                     </Grid>
-
                     <Grid item xs={12} sm={6}>
                       {/*<TextField
                         margin="normal"
@@ -469,7 +546,6 @@ export default function Ajouter() {
                         />
                       </LocalizationProvider>
                     </Grid>
-
                     <Grid item xs={12} sm={6}>
                       {/*<TextField
                         margin="normal"
@@ -494,7 +570,6 @@ export default function Ajouter() {
                         />
                       </LocalizationProvider>
                     </Grid>
-
                     <Grid item xs={12}>
                       <TextField
                         margin="normal"
@@ -518,7 +593,6 @@ export default function Ajouter() {
                         ))}
                       </TextField>
                     </Grid>
-
                     <Grid item xs={12}>
                       <TextField
                         margin="normal"
@@ -554,7 +628,8 @@ export default function Ajouter() {
                     <img
                       src={`${url}?w=164&h=164&fit=crop&auto=format`}
                       loading="lazy"
-                      sx={{ width: 300, height: 200 }}
+                      width="400"
+                      height="200"
                     />
                   </Grid>
 

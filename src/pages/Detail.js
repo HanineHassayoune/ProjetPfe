@@ -42,6 +42,7 @@ export default function TransferList() {
     adressePointVente: "",
     email: "",
     numerotlf: "",
+    urlImagePtv: "",
   });
   const [article, setArticle] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -59,7 +60,8 @@ export default function TransferList() {
           values.titrePointVente,
           values.adressePointVente,
           values.email,
-          values.numerotlf
+          values.numerotlf,
+          values.urlImagePtv
         );
         setDetail(pointVente);
 
@@ -243,17 +245,26 @@ export default function TransferList() {
               </Typography>
 
               <Card>
-                <Typography variant="h6">
-                  Titre : {detail.titrePointVente}
-                </Typography>
-                <br />
-                <Typography variant="h6">
-                  Adresse:{detail.adressePointVente}
-                </Typography>
-                <br />
-                <Typography variant="h6">Email:{detail.email}</Typography>
-                <br />
-                <Typography variant="h6">Numéro:{detail.numerotlf}</Typography>
+                <Grid container spacing={10}>
+                  <Grid item xs={9} sm={4}>
+                    <img src={detail.urlImagePtv} width="400" height="300" />
+                  </Grid>
+                  <Grid item xs={9} sm={5}>
+                    <Typography variant="h6">
+                      Titre : {detail.titrePointVente}
+                    </Typography>
+                    <br />
+                    <Typography variant="h6">
+                      Adresse:{detail.adressePointVente}
+                    </Typography>
+                    <br />
+                    <Typography variant="h6">Email:{detail.email}</Typography>
+                    <br />
+                    <Typography variant="h6">
+                      Numéro:{detail.numerotlf}
+                    </Typography>
+                  </Grid>
+                </Grid>
               </Card>
             </Grid>
             {/* list1 */}
