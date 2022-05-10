@@ -24,9 +24,12 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
-import { getUserFromLocalStorage } from "../controleurs/CompteControleur";
+import { getConnectedUser } from "../controleurs/CompteControleur";
 import { getUserById } from "../controleurs/CompteControleur";
 import { CompteModel } from "../Models/CompteModel";
+import Alert from "@mui/material/Alert";
+import AlertTitle from "@mui/material/AlertTitle";
+import Stack from "@mui/material/Stack";
 
 const status = [
   {
@@ -94,6 +97,10 @@ const TypesArticle = [
     value: "panier",
     label: "panier",
   },
+  {
+    value: "Produit laitier",
+    label: "Produit laitier",
+  },
 ];
 export default function Ajouter() {
   const [statutArticle, setStatutArticle] = useState("");
@@ -136,11 +143,7 @@ export default function Ajouter() {
   });
   const theme = createTheme();
   const navigate = useNavigate();
-  /* let localUser = localStorage.getItem("connected_user");
-  const jsonUser = JSON.parse(localUser);
-  console.log("Test", jsonUser);
-  const [user, setUser] = useState(jsonUser);
-  console.log("user here", user);*/
+
   useEffect(() => {
     console.log("use effect here");
     consulterListePointsVente().then((snapshot) => {
@@ -159,10 +162,9 @@ export default function Ajouter() {
       console.log("listPTV  :", listPTV);
     });
 
-    let localUser = localStorage.getItem("connected_user");
-    const jsonUser = JSON.parse(localUser);
+    const jsonUser = getConnectedUser();
     console.log("jsonUser", jsonUser);
-    getUserById(jsonUser.id)
+    getUserById(jsonUser.uid)
       .then((snapshot) => {
         let values = snapshot.data();
         setLoading(false);
@@ -341,6 +343,7 @@ export default function Ajouter() {
           console.log("article saved with succes");
           console.log("dataValues ", dataValues);
           setIdArticlesToPointVente(dataValues.idPointVente, [dataValues.id]);
+          alert("votre article est ajouté avec succès");
           navigate("/consulter/articles");
         })
         .catch(() => {
@@ -431,7 +434,7 @@ export default function Ajouter() {
                         id="nomPointVente"
                         label="Nom point de vente"
                         name="nomPointVente"
-                        autoComplete="nomPointVente"
+                        //autoComplete="nomPointVente"
                         error={errors.nomPointVente ? true : false}
                         helperText={errors.nomPointVente}
                         select
@@ -542,7 +545,13 @@ export default function Ajouter() {
                           onChange={(newDateV) => {
                             setDateV(newDateV);
                           }}
-                          renderInput={(params) => <TextField {...params} />}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              error
+                              helperText="Your error message"
+                            />
+                          )}
                         />
                       </LocalizationProvider>
                     </Grid>

@@ -76,9 +76,12 @@ export default function Connexion() {
     if (_user.exists) {
       _user.data();
       console.log("_user", _user.data());
-      localStorage.setItem("connected_user", JSON.stringify(_user.data()));
+
       navigate("/statistique");
-    } else console.log("user n'existe pas");
+    } else {
+      console.log("user n'existe pas");
+      alert("compte n'existe pas");
+    }
 
     //methode -->get user by id (id) -->return element :commercant (page statistic)sinon: autre type d'utilisateur(errer) + log out
   };

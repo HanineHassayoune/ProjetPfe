@@ -106,7 +106,7 @@ export default function ConsulterPointsVente() {
                 sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
               >
                 <TableCell align="center">
-                  <img src={row.urlImagePtv} width="100" height="60" />
+                  <img src={row.urlImagePtv} width="120" height="70" />
                 </TableCell>
                 <TableCell align="center">{row.id}</TableCell>
                 <TableCell align="center">{row.titrePointVente}</TableCell>

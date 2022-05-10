@@ -11,6 +11,7 @@ import { useState, useEffect } from "react";
 import CircularProgress from "@mui/material/CircularProgress";
 import { updateCompte, getUserById } from "../controleurs/CompteControleur";
 import { CompteModel } from "../Models/CompteModel";
+import { getConnectedUser } from "../controleurs/CompteControleur";
 
 export default function ModifierCompte() {
   const [data, setData] = useState({
@@ -69,10 +70,11 @@ export default function ModifierCompte() {
 
   useEffect(() => {
     console.log("use effect here");
-    let localUser = localStorage.getItem("connected_user");
-    const jsonUser = JSON.parse(localUser);
+
+    const jsonUser = getConnectedUser();
     console.log("jsonUser", jsonUser);
-    getUserById(jsonUser.id)
+
+    getUserById(jsonUser.uid)
       .then((snapshot) => {
         let values = snapshot.data();
         setLoading(false);
@@ -96,6 +98,8 @@ export default function ModifierCompte() {
   const handleSubmit = (event) => {
     event.preventDefault();
     updateCompte(user);
+    alert("votre compte est modifié avec succès");
+
     console.log("user after update", user);
 
     /* if (isFormValid(data)) {

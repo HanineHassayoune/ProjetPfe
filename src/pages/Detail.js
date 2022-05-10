@@ -20,6 +20,7 @@ import {
   deleteIdArticlesToPointVente,
 } from "../controleurs/PointDeVenteControleur";
 import { getListArticlesFromPtvByListId } from "../controleurs/ArticleControleurs";
+import CircularProgress from "@mui/material/CircularProgress";
 import { Box } from "@mui/material";
 function not(a, b) {
   return a.filter((value) => b.indexOf(value) === -1);
@@ -222,7 +223,15 @@ export default function TransferList() {
   return (
     <>
       {loading ? (
-        <>"is loading" </>
+        <>
+          <Typography
+            variant="h4"
+            color="primary"
+            sx={{ fontFamily: "cursive" }}
+          >
+            Loading <CircularProgress />
+          </Typography>
+        </>
       ) : (
         <>
           <Grid
@@ -253,13 +262,13 @@ export default function TransferList() {
                     <Typography variant="h6">
                       Titre : {detail.titrePointVente}
                     </Typography>
-                    <br />
+
                     <Typography variant="h6">
                       Adresse:{detail.adressePointVente}
                     </Typography>
-                    <br />
+
                     <Typography variant="h6">Email:{detail.email}</Typography>
-                    <br />
+
                     <Typography variant="h6">
                       Numéro:{detail.numerotlf}
                     </Typography>

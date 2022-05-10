@@ -30,6 +30,12 @@ export async function getUserById(id) {
   console.log(id);
   return await docRef.doc(id).get();
 }
+
+export function getListClientByListId(listIdClients) {
+  if (listIdClients.length === 0) return Promise.all([]);
+  return db.collection("ComptesClient").where("id", "in", listIdClients);
+}
+
 export const login = async ({ email, password }) => {
   const res = await firebase.auth().signInWithEmailAndPassword(email, password);
   return res.user;
@@ -37,22 +43,15 @@ export const login = async ({ email, password }) => {
 
 export function updateCompte(data) {
   var docRef = db.collection("ComptesCommercant");
-  updateEmailUserFromAuth(data.email);
+  // updateEmailUserFromAuth(data.email);
   return docRef.doc(data.id).update(data);
 }
 
-export function updateEmailUserFromAuth(newEmail) {
+/*export function updateEmailUserFromAuth(newEmail) {
   var user = firebase.auth().currentUser;
   return user.updateEmail(newEmail);
-}
+}*/
 
-export function logOut() {
-  return localStorage.removeItem("connected_user");
-
-  //return firebase.auth().signOut();
+export function getConnectedUser() {
+  return firebase.auth().currentUser;
 }
-/*firebase.auth().signOut().then(() => {
-  // Sign-out successful.
-}).catch((error) => {
-  // An error happened.
-});*/

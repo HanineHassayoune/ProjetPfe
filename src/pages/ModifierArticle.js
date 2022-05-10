@@ -22,6 +22,7 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import moment from "moment";
+import { useNavigate } from "react-router-dom";
 
 const status = [
   {
@@ -88,8 +89,26 @@ const TypesArticle = [
     value: "panier",
     label: "panier",
   },
+  {
+    value: "Produit laitier",
+    label: "Produit laitier",
+  },
 ];
 export default function ModifierArticle() {
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [dateV, setDateV] = useState(null);
+  const [dateR, setDateR] = useState(null);
+  const [typeArticle, setTypeArticle] = useState("");
+  const regNum = new RegExp("^[0-9\b]+$");
+  const regNom = new RegExp("^[a-zA-Z]+[a-zA-Z]+$");
+  const [image, setImage] = useState(null);
+  const [url, setUrl] = useState("");
+  const [progress, setProgress] = useState(0);
+  const Input = styled("input")({
+    display: "none",
+  });
+  const theme = createTheme();
   const [data, setData] = useState({
     titreArticle: "",
     typeArticle: "",
@@ -106,9 +125,6 @@ export default function ModifierArticle() {
     statut: "",
     description: "",
   });
-  const [loading, setLoading] = useState(true);
-  const [dateV, setDateV] = useState(null);
-  const [dateR, setDateR] = useState(null);
   const [errors, setErrors] = useState({
     titreArticle: "",
     typeArticle: "",
@@ -124,11 +140,11 @@ export default function ModifierArticle() {
     statut: "",
     description: "",
   });
-  const [typeArticle, setTypeArticle] = useState("");
-  const Input = styled("input")({
-    display: "none",
-  });
+  //get id article from url
+  let { id } = useParams();
+  console.log(id);
 
+  //get article from firebase by id
   useEffect(() => {
     console.log("use effect here ");
     getArticleById(id)
@@ -161,9 +177,6 @@ export default function ModifierArticle() {
       });
   }, []);
 
-  let { id } = useParams();
-  console.log(id);
-
   //modifier article
   const modifierArticle = (data) => {
     updateArticle(data)
@@ -174,13 +187,48 @@ export default function ModifierArticle() {
         console.error("Error : ", error);
       });
   };
+  //modifier image d'article
+  const handleChangeImage = (e) => {
+    if (e.target.files[0]) {
+      console.log("hello ");
+      setImage(e.target.files[0]);
+      console.log("image", e.target.files[0]);
+      handleUpload(e.target.files[0]);
+    }
+  };
 
-  const theme = createTheme();
+  const handleUpload = (_image) => {
+    let imageName = createUUID() + _image.name;
+    const uploadTask = storage.ref(`images/${imageName}`).put(_image);
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        const progress = Math.round(
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+        );
+        setProgress(progress);
+      },
+      (error) => {
+        console.log(error);
+      },
+      () => {
+        storage
+          .ref("images")
+          .child(imageName)
+          .getDownloadURL()
+          .then((url) => {
+            setUrl(url);
+            setData({ ...data, ["urlImage"]: url });
+            console.log(url);
+          })
+          .catch((error) => {
+            console.log(" !! ", error);
+          });
+      }
+    );
+  };
 
-  //validation formulaire
-  const regNum = new RegExp("^[0-9\b]+$");
-  const regNom = new RegExp("^[a-zA-Z]+[a-zA-Z]+$");
-
+  //validation form
   const isFormValid = (data) => {
     const _errors = { ...errors };
     if (!data.titreArticle) {
@@ -245,16 +293,7 @@ export default function ModifierArticle() {
     } else return false;
   };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    console.log(data);
-
-    if (isFormValid(data)) {
-      console.log("form valid");
-      modifierArticle(data);
-    } else console.log("form nom valid");
-  };
-
+  //change form
   const handleChange = (event) => {
     //a faire pour tout les champs dans le formulaire==>ligne 178
     /* if (event.target.name === "titreArticle") {
@@ -266,49 +305,17 @@ export default function ModifierArticle() {
     setData({ ...data, [event.target.name]: event.target.value });
   };
 
-  //modifier image
-  const [image, setImage] = useState(null);
-  const [url, setUrl] = useState("");
-  const [progress, setProgress] = useState(0);
+  //submit form after validation
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    console.log(data);
 
-  const handleChangee = (e) => {
-    if (e.target.files[0]) {
-      console.log("hello ");
-      setImage(e.target.files[0]);
-      console.log("image", e.target.files[0]);
-      handleUpload(e.target.files[0]);
-    }
-  };
-
-  const handleUpload = (_image) => {
-    let imageName = createUUID() + _image.name;
-    const uploadTask = storage.ref(`images/${imageName}`).put(_image);
-    uploadTask.on(
-      "state_changed",
-      (snapshot) => {
-        const progress = Math.round(
-          (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-        );
-        setProgress(progress);
-      },
-      (error) => {
-        console.log(error);
-      },
-      () => {
-        storage
-          .ref("images")
-          .child(imageName)
-          .getDownloadURL()
-          .then((url) => {
-            setUrl(url);
-            setData({ ...data, ["urlImage"]: url });
-            console.log(url);
-          })
-          .catch((error) => {
-            console.log(" !! ", error);
-          });
-      }
-    );
+    if (isFormValid(data)) {
+      console.log("form valid");
+      modifierArticle(data);
+      alert("votre article est modifié avec succès");
+      navigate("/consulter/articles");
+    } else console.log("form nom valid");
   };
 
   return (
@@ -601,7 +608,7 @@ export default function ModifierArticle() {
                         id="contained-button-file"
                         multiple
                         type="file"
-                        onChange={handleChangee}
+                        onChange={handleChangeImage}
                       />
                       <Button variant="contained" component="span" fullWidth>
                         Modifier image

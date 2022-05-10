@@ -13,18 +13,44 @@ import { getPointsVenteById } from "../controleurs/PointDeVenteControleur";
 import { PointDeVenteModel } from "../Models/PointDeVenteModel";
 import { updatePointsVente } from "../controleurs/PointDeVenteControleur";
 import { useEffect } from "react";
+import { styled } from "@mui/material/styles";
+import { storage } from "../Helpers/FireBase";
+import { createUUID } from "../Helpers/Helper";
+import { Grid } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import CircularProgress from "@mui/material/CircularProgress";
 
 export default function ModifierPointVente() {
+  //get id point de vente from url
   let { id } = useParams();
   console.log(id);
+  const theme = createTheme();
+  const [loading, setLoading] = useState(true);
+  const [image, setImage] = useState(null);
+  const [url, setUrl] = useState("");
+  const [progress, setProgress] = useState(0);
+  const pattern = new RegExp("^[a-zA-Z0-9]+@[a-zA-Z0-9]+[.][A-Za-z]+$");
+  const regNom = new RegExp("^[a-zA-Z]+[a-zA-Z]+$");
+  const regNum = new RegExp("^[0-9\b]+$");
+  const navigate = useNavigate();
   const [data, setData] = useState({
     titrePointVente: "",
-    email: "",
     adressePointVente: "",
+    email: "",
     numerotlf: "",
+    urlImagePtv: "",
+  });
+  const [errors, setErrors] = useState({
+    titrePointVente: "",
+    adressePointVente: "",
+    email: "",
+    numerotlf: "",
+    urlImagePtv: "",
+  });
+  const Input = styled("input")({
+    display: "none",
   });
 
-  const [loading, setLoading] = useState(true);
   useEffect(() => {
     console.log("use effect here ");
     getPointsVenteById(id)
@@ -34,10 +60,12 @@ export default function ModifierPointVente() {
         setLoading(false);
         const pointVente = new PointDeVenteModel(
           values.id,
+          values.idArticles,
           values.titrePointVente,
           values.adressePointVente,
           values.email,
-          values.numerotlf
+          values.numerotlf,
+          values.urlImagePtv
         );
         setData(pointVente);
       })
@@ -46,18 +74,48 @@ export default function ModifierPointVente() {
       });
   }, []);
 
-  const theme = createTheme();
-  const [errors, setErrors] = useState({
-    titrePointVente: "",
-    email: "",
-    adressePointVente: "",
-    numerotlf: "",
-  });
+  //modifier image point de vente
+  const handleChangeImage = (e) => {
+    if (e.target.files[0]) {
+      console.log("hello ");
+      setImage(e.target.files[0]);
+      console.log("image", e.target.files[0]);
+      handleUpload(e.target.files[0]);
+    }
+  };
+
+  const handleUpload = (_image) => {
+    let imageName = createUUID() + _image.name;
+    const uploadTask = storage.ref(`images/${imageName}`).put(_image);
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        const progress = Math.round(
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+        );
+        setProgress(progress);
+      },
+      (error) => {
+        console.log(error);
+      },
+      () => {
+        storage
+          .ref("images")
+          .child(imageName)
+          .getDownloadURL()
+          .then((url) => {
+            setUrl(url);
+            setData({ ...data, ["urlImagePtv"]: url });
+            console.log(url);
+          })
+          .catch((error) => {
+            console.log(" !! ", error);
+          });
+      }
+    );
+  };
 
   //validation formulaire
-  const pattern = new RegExp("^[a-zA-Z0-9]+@[a-zA-Z0-9]+[.][A-Za-z]+$");
-  const regNom = new RegExp("^[a-zA-Z]+[a-zA-Z]+$");
-  const regNum = new RegExp("^[0-9\b]+$");
 
   const isFormValid = (data) => {
     const _errors = { ...errors };
@@ -106,6 +164,12 @@ export default function ModifierPointVente() {
       });
   };
 
+  //modifier formulaire
+  const handleChange = (event) => {
+    setData({ ...data, [event.target.name]: event.target.value });
+  };
+
+  //submit form after validation form
   const handleSubmit = (event) => {
     event.preventDefault();
     console.log(data);
@@ -113,17 +177,22 @@ export default function ModifierPointVente() {
     if (isFormValid(data)) {
       console.log("form valid");
       modifierPointVente(data);
+      alert("votre point de vente est modifié avec succès");
+      navigate("/consulter/pointsvente");
     } else console.log("form non valid");
   };
-
-  const handleChange = (event) => {
-    setData({ ...data, [event.target.name]: event.target.value });
-  };
-
   return (
     <>
       {loading ? (
-        <>"is loading" </>
+        <>
+          <Typography
+            variant="h4"
+            color="primary"
+            sx={{ fontFamily: "cursive" }}
+          >
+            Loading <CircularProgress />
+          </Typography>
+        </>
       ) : (
         <>
           <ThemeProvider theme={theme}>
@@ -149,63 +218,90 @@ export default function ModifierPointVente() {
                   noValidate
                   sx={{ mt: 1 }}
                 >
-                  <TextField
-                    margin="normal"
-                    required
-                    fullWidth
-                    id="titrePointVente"
-                    label="Titre point de vente"
-                    name="titrePointVente"
-                    autoComplete="titrePointVente"
-                    error={errors.titrePointVente ? true : false}
-                    helperText={errors.titrePointVente}
-                    onChange={(e) => handleChange(e)}
-                    value={data.titrePointVente}
-                  />
+                  <Grid item xs={12}>
+                    <TextField
+                      margin="normal"
+                      required
+                      fullWidth
+                      id="titrePointVente"
+                      label="Titre point de vente"
+                      name="titrePointVente"
+                      autoComplete="titrePointVente"
+                      error={errors.titrePointVente ? true : false}
+                      helperText={errors.titrePointVente}
+                      onChange={(e) => handleChange(e)}
+                      value={data.titrePointVente}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      margin="normal"
+                      required
+                      fullWidth
+                      name="adressePointVente"
+                      label="Adresse point vente"
+                      type="adressePointVente"
+                      id="adressePointVente"
+                      autoComplete="adressePointVente"
+                      error={errors.adressePointVente ? true : false}
+                      helperText={errors.adressePointVente}
+                      onChange={(e) => handleChange(e)}
+                      value={data.adressePointVente}
+                    />
+                  </Grid>
 
-                  <TextField
-                    margin="normal"
-                    required
-                    fullWidth
-                    name="adressePointVente"
-                    label="Adresse point vente"
-                    type="adressePointVente"
-                    id="adressePointVente"
-                    autoComplete="adressePointVente"
-                    error={errors.adressePointVente ? true : false}
-                    helperText={errors.adressePointVente}
-                    onChange={(e) => handleChange(e)}
-                    value={data.adressePointVente}
-                  />
-
-                  <TextField
-                    margin="normal"
-                    required
-                    fullWidth
-                    name="email"
-                    label="Email"
-                    type="email"
-                    id="email"
-                    autoComplete="email"
-                    error={errors.email ? true : false}
-                    helperText={errors.email}
-                    onChange={(e) => handleChange(e)}
-                    value={data.email}
-                  />
-
-                  <TextField
-                    margin="normal"
-                    required
-                    fullWidth
-                    name="numerotlf"
-                    label="Numéro téléphone"
-                    type="numerotlf"
-                    id="numerotlf"
-                    autoComplete="numerotlf"
-                    error={errors.numerotlf ? true : false}
-                    helperText={errors.numerotlf}
-                    onChange={(e) => handleChange(e)}
-                    value={data.numerotlf}
+                  <Grid item xs={12}>
+                    <TextField
+                      margin="normal"
+                      required
+                      fullWidth
+                      name="email"
+                      label="Email"
+                      type="email"
+                      id="email"
+                      // autoComplete="email"
+                      disabled
+                      error={errors.email ? true : false}
+                      helperText={errors.email}
+                      onChange={(e) => handleChange(e)}
+                      value={data.email}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      margin="normal"
+                      required
+                      fullWidth
+                      name="numerotlf"
+                      label="Numéro téléphone"
+                      type="numerotlf"
+                      id="numerotlf"
+                      autoComplete="numerotlf"
+                      error={errors.numerotlf ? true : false}
+                      helperText={errors.numerotlf}
+                      onChange={(e) => handleChange(e)}
+                      value={data.numerotlf}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <label htmlFor="contained-button-file">
+                      <Input
+                        accept="image/*"
+                        id="contained-button-file"
+                        multiple
+                        type="file"
+                        onChange={handleChangeImage}
+                      />
+                      <Button variant="contained" component="span" fullWidth>
+                        Modifier image
+                      </Button>
+                    </label>
+                  </Grid>
+                  <img
+                    src={`${data.urlImagePtv}?w=164&h=164&fit=crop&auto=format`}
+                    loading="lazy"
+                    width="400"
+                    height="200"
                   />
 
                   <Button

@@ -51,3 +51,8 @@ export function deleteIdArticlesToPointVente(idPointVente, listIdArticles) {
     idArticles: firebase.firestore.FieldValue.arrayRemove(...listIdArticles),
   });
 }
+
+export function getListPointVenteByListId(listIdPtv) {
+  if (listIdPtv.length === 0) return Promise.all([]);
+  return db.collection("PointsDeVente").where("id", "in", listIdPtv).get();
+}

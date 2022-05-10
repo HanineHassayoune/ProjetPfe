@@ -71,7 +71,7 @@ export default function CreerCompte() {
       email: data.get("email"),
     };
 
-   /* if (isFormValid(dataValues)) {
+    /* if (isFormValid(dataValues)) {
       console.log("form valid");
       await register(form);
     await creerCompte(dataValues);
@@ -79,7 +79,6 @@ export default function CreerCompte() {
       console.log("form non valid");
     }*/
 
-    
     await register(form);
     await creerCompte(dataValues);
 

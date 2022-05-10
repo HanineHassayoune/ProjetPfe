@@ -13,7 +13,7 @@ import Alert from "@mui/material/Alert";
 import AlertTitle from "@mui/material/AlertTitle";
 import { useNavigate } from "react-router-dom";
 import CircularProgress from "@mui/material/CircularProgress";
-import { getUserById } from "../controleurs/CompteControleur";
+import { getUserById, getConnectedUser } from "../controleurs/CompteControleur";
 import { CompteModel } from "../Models/CompteModel";
 import { storage } from "../Helpers/FireBase";
 import { createUUID } from "../Helpers/Helper";
@@ -31,6 +31,7 @@ export default function AjouterPointVente() {
     email: "",
     adressePointVente: "",
     numerotlf: "",
+    urlImagePtv: "",
   });
   const Input = styled("input")({
     display: "none",
@@ -43,10 +44,10 @@ export default function AjouterPointVente() {
   });
   useEffect(() => {
     console.log("use effect here");
-    let localUser = localStorage.getItem("connected_user");
-    const jsonUser = JSON.parse(localUser);
+
+    const jsonUser = getConnectedUser();
     console.log("jsonUser", jsonUser);
-    getUserById(jsonUser.id)
+    getUserById(jsonUser.uid)
       .then((snapshot) => {
         let values = snapshot.data();
         setLoading(false);

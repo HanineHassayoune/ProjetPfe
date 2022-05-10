@@ -1,15 +1,14 @@
 import { db } from "../Helpers/FireBase";
 import { ArticleModel } from "../Models/ArticleModel";
 import { storage } from "../Helpers/FireBase";
+import { getConnectedUser } from "./CompteControleur";
 
 export function ajouterArticle(data) {
-  let localUser = localStorage.getItem("connected_user");
-  const jsonUser = JSON.parse(localUser);
-  //console.log("Test", jsonUser);
+  let user = getConnectedUser();
   let docRef = db.collection("Articles").doc();
   let articleId = docRef.id;
   data.id = articleId;
-  let idCommercant = jsonUser.id;
+  let idCommercant = user.uid;
   let articleToAdd = new ArticleModel(
     articleId,
     idCommercant,
@@ -54,12 +53,6 @@ export function updateArticle(data) {
   return docRef.doc(data.id).update(data);
 }
 
-/*export function uploadImage(file) {
-  var storageRef = storage.ref();
-  return storageRef.put(file);
-  // return storageRef.child('images/mountains.jpg');
-}
-*/
 //let LeftList = snapshot.docs.map((doc) => doc.data());
 export function getListArticlesFromPtvByListId(listIdArticles) {
   if (listIdArticles.length === 0) return Promise.all([]);
@@ -73,4 +66,9 @@ export function getListArticlesFromPtvByListId(listIdArticles) {
     });
   // var docRef = db.collection("Articles").where("id", "in", listIdArticles);
   // return docRef.get();
+}
+
+export function getListArticlesByListId(listIdArticles) {
+  if (listIdArticles.length === 0) return Promise.all([]);
+  return db.collection("Articles").where("id", "in", listIdArticles).get();
 }
