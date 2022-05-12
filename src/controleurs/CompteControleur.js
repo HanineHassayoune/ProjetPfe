@@ -6,10 +6,17 @@ import "firebase/auth";
 export function creerCompte(data) {
   firebase.auth().onAuthStateChanged((user) => {
     if (user) {
-      let docRef = db.collection("ComptesCommercant").doc(user.uid);
+      let docRef = db.collection("Comptes").doc(user.uid);
       console.log(user.uid);
       let id = user.uid;
-      let compteToAdd = new CompteModel(id, data.nom, data.prenom, data.email);
+      let type = "commercant";
+      let compteToAdd = new CompteModel(
+        id,
+        data.nom,
+        data.prenom,
+        type,
+        data.email
+      );
       console.log("compteToAdd", compteToAdd);
       return docRef.set(Object.assign({}, compteToAdd));
     }
@@ -26,14 +33,14 @@ export const register = async ({ email, password }) => {
 };
 
 export async function getUserById(id) {
-  var docRef = db.collection("ComptesCommercant");
+  var docRef = db.collection("Comptes");
   console.log(id);
   return await docRef.doc(id).get();
 }
 
 export function getListClientByListId(listIdClients) {
   if (listIdClients.length === 0) return Promise.all([]);
-  return db.collection("ComptesClient").where("id", "in", listIdClients);
+  return db.collection("Comptes").where("id", "in", listIdClients).get();
 }
 
 export const login = async ({ email, password }) => {
@@ -42,7 +49,7 @@ export const login = async ({ email, password }) => {
 };
 
 export function updateCompte(data) {
-  var docRef = db.collection("ComptesCommercant");
+  var docRef = db.collection("Comptes");
   // updateEmailUserFromAuth(data.email);
   return docRef.doc(data.id).update(data);
 }
@@ -52,6 +59,14 @@ export function updateCompte(data) {
   return user.updateEmail(newEmail);
 }*/
 
-export function getConnectedUser() {
-  return firebase.auth().currentUser;
+export function Deconnexion() {
+  firebase
+    .auth()
+    .signOut()
+    .then(() => {
+      console.log("Sign-out successful");
+    })
+    .catch((error) => {
+      console.error("Error : ", error);
+    });
 }

@@ -160,7 +160,10 @@ export default function ConsulterPointsVente() {
             size="large"
             color="error"
             sx={{ margin: 8 }}
-            onClick={supprimerPointDeVente}
+            onClick={() => {
+              supprimerPointDeVente();
+              handleClose();
+            }}
           >
             supprimer
           </Button>

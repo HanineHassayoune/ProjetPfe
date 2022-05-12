@@ -11,12 +11,13 @@ import { useState, useEffect } from "react";
 import CircularProgress from "@mui/material/CircularProgress";
 import { updateCompte, getUserById } from "../controleurs/CompteControleur";
 import { CompteModel } from "../Models/CompteModel";
-import { getConnectedUser } from "../controleurs/CompteControleur";
+import { getConnectedUser } from "../Helpers/FireBase";
 
 export default function ModifierCompte() {
   const [data, setData] = useState({
     nom: "",
     prenom: "",
+    type: "",
     email: "",
     password: "",
   });
@@ -25,12 +26,14 @@ export default function ModifierCompte() {
   const [errors, setErrors] = useState({
     nom: "",
     prenom: "",
+    type: "",
     email: "",
     password: "",
   });
   const [user, setUser] = useState({
     nom: "",
     prenom: "",
+    type: "",
     email: "",
   });
 
@@ -70,26 +73,28 @@ export default function ModifierCompte() {
 
   useEffect(() => {
     console.log("use effect here");
-
-    const jsonUser = getConnectedUser();
-    console.log("jsonUser", jsonUser);
-
-    getUserById(jsonUser.uid)
-      .then((snapshot) => {
-        let values = snapshot.data();
-        setLoading(false);
-        const compte = new CompteModel(
-          values.id,
-          values.nom,
-          values.prenom,
-          values.email
-        );
-        setUser(compte);
-        console.log("compteUser", compte);
-      })
-      .catch((error) => {
-        console.error("Error : ", error);
-      });
+    getConnectedUser().then((_user) => {
+      console.log("_user", _user);
+      const jsonUser = _user;
+      console.log("jsonUser", jsonUser);
+      getUserById(jsonUser.uid)
+        .then((snapshot) => {
+          let values = snapshot.data();
+          setLoading(false);
+          const compte = new CompteModel(
+            values.id,
+            values.nom,
+            values.prenom,
+            values.type,
+            values.email
+          );
+          setUser(compte);
+          console.log("compteUser", compte);
+        })
+        .catch((error) => {
+          console.error("Error : ", error);
+        });
+    });
   }, []);
 
   const handleChange = (event) => {
@@ -182,7 +187,8 @@ export default function ModifierCompte() {
                     label="Email"
                     type="email"
                     id="email"
-                    autoComplete="email"
+                    // autoComplete="email"
+                    disabled
                     error={errors.email ? true : false}
                     helperText={errors.email}
                     value={user.email}

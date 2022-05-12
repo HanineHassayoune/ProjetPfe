@@ -14,22 +14,17 @@ import MenuItem from "@mui/material/MenuItem";
 import { styled } from "@mui/material/styles";
 import { storage } from "../Helpers/FireBase";
 import { createUUID } from "../Helpers/Helper";
-import {
-  consulterListePointsVente,
-  setIdArticlesToPointVente,
-} from "../controleurs/PointDeVenteControleur";
+import { consulterListePointsVente } from "../controleurs/PointDeVenteControleur";
+import { setIdArticlesToPointVente } from "../controleurs/PointDeVenteControleur";
 import CircularProgress from "@mui/material/CircularProgress";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
-import { getConnectedUser } from "../controleurs/CompteControleur";
+import { getConnectedUser } from "../Helpers/FireBase";
 import { getUserById } from "../controleurs/CompteControleur";
 import { CompteModel } from "../Models/CompteModel";
-import Alert from "@mui/material/Alert";
-import AlertTitle from "@mui/material/AlertTitle";
-import Stack from "@mui/material/Stack";
 
 const status = [
   {
@@ -69,6 +64,10 @@ const Unite = [
   {
     value: "cl",
     label: "cl",
+  },
+  {
+    value: "boite",
+    label: "boite",
   },
   {
     value: "Autre",
@@ -161,25 +160,28 @@ export default function Ajouter() {
 
       console.log("listPTV  :", listPTV);
     });
-
-    const jsonUser = getConnectedUser();
-    console.log("jsonUser", jsonUser);
-    getUserById(jsonUser.uid)
-      .then((snapshot) => {
-        let values = snapshot.data();
-        setLoading(false);
-        const compte = new CompteModel(
-          values.id,
-          values.nom,
-          values.prenom,
-          values.email
-        );
-        setUser(compte);
-        console.log("compteUser", compte);
-      })
-      .catch((error) => {
-        console.error("Error : ", error);
-      });
+    getConnectedUser().then((_user) => {
+      console.log("_user", _user);
+      const jsonUser = _user;
+      console.log("jsonUser", jsonUser);
+      getUserById(jsonUser.uid)
+        .then((snapshot) => {
+          let values = snapshot.data();
+          setLoading(false);
+          const compte = new CompteModel(
+            values.id,
+            values.nom,
+            values.prenom,
+            values.type,
+            values.email
+          );
+          setUser(compte);
+          console.log("compteUser", compte);
+        })
+        .catch((error) => {
+          console.error("Error : ", error);
+        });
+    });
   }, []);
 
   const handleChange = (event) => {
@@ -242,10 +244,8 @@ export default function Ajouter() {
     );
   };
 
-  // console.log("image: ", image);
-
   const regNum = new RegExp("^[0-9\b]+$");
-  const regNom = new RegExp("^[a-zA-Z]+[a-zA-Z]+$");
+  const regNom = new RegExp("^[a-zA-Z]+ [a-zA-Z]+|[a-zA-Z]+$");
 
   // validation formulaire
   const isFormValid = (data) => {
@@ -255,23 +255,18 @@ export default function Ajouter() {
     } else if (!regNom.test(data.titreArticle)) {
       _errors.titreArticle = "Titre contient uniquement des lettres ";
     } else _errors.titreArticle = "";
-
+    if (!data.typeArticle) {
+      _errors.typeArticle = "Type article est obligatoire";
+    } else _errors.typeArticle = "";
     if (!data.nomPointVente) {
       _errors.nomPointVente = "Nom point vente est obligatoire";
     } else _errors.nomPointVente = "";
-
-    if (!data.nomCommercant) {
-      _errors.nomCommercant = "Nom commerçant est obligatoire";
-    } else if (!regNom.test(data.nomCommercant)) {
-      _errors.nomCommercant = "Nom contient uniquement des lettres ";
-    } else _errors.nomCommercant = "";
 
     if (!data.prixInitial) {
       _errors.prixInitial = "Prix initial est obligatoire";
     } else if (!regNum.test(data.prixInitial)) {
       _errors.prixInitial = "Prix initial contient uniquement des chiffres ";
     } else _errors.prixInitial = "";
-
     if (!data.prixActuel) {
       _errors.prixActuel = "Prix actuel est obligatoire";
     } else if (!regNum.test(data.prixActuel)) {
@@ -319,6 +314,7 @@ export default function Ajouter() {
     var _date = moment(dateR).format("L");
 
     const dataValues = {
+      idCommercant: user.id,
       titreArticle: data.get("titreArticle"),
       typeArticle: data.get("typeArticle"),
       urlImage: url,
@@ -334,7 +330,7 @@ export default function Ajouter() {
       statut: data.get("statut"),
       description: data.get("description"),
     };
-
+    console.log("dataValues avant firebase", dataValues);
     if (isFormValid(dataValues)) {
       console.log("form valid");
       console.log("______ ", dataValues);
@@ -343,7 +339,7 @@ export default function Ajouter() {
           console.log("article saved with succes");
           console.log("dataValues ", dataValues);
           setIdArticlesToPointVente(dataValues.idPointVente, [dataValues.id]);
-          alert("votre article est ajouté avec succès");
+         
           navigate("/consulter/articles");
         })
         .catch(() => {
@@ -413,8 +409,8 @@ export default function Ajouter() {
                         label="Type article"
                         name="typeArticle"
                         autoComplete="typeArticle"
-                        // error={errors.typeArticle ? true : false}
-                        // helperText={errors.typeArticle}
+                        error={errors.typeArticle ? true : false}
+                        helperText={errors.typeArticle}
                         select
                         value={typeArticle}
                         onChange={handleChangeTypeArticle}
@@ -434,7 +430,6 @@ export default function Ajouter() {
                         id="nomPointVente"
                         label="Nom point de vente"
                         name="nomPointVente"
-                        //autoComplete="nomPointVente"
                         error={errors.nomPointVente ? true : false}
                         helperText={errors.nomPointVente}
                         select
@@ -455,7 +450,6 @@ export default function Ajouter() {
                         fullWidth
                         id="nomCommercant"
                         name="nomCommercant"
-                        //autoComplete="nomCommercant"
                         error={errors.nomCommercant ? true : false}
                         helperText={errors.nomCommercant}
                         value={user.prenom}
@@ -545,13 +539,7 @@ export default function Ajouter() {
                           onChange={(newDateV) => {
                             setDateV(newDateV);
                           }}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              error
-                              helperText="Your error message"
-                            />
-                          )}
+                          renderInput={(params) => <TextField {...params} />}
                         />
                       </LocalizationProvider>
                     </Grid>

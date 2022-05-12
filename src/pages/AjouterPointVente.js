@@ -13,12 +13,13 @@ import Alert from "@mui/material/Alert";
 import AlertTitle from "@mui/material/AlertTitle";
 import { useNavigate } from "react-router-dom";
 import CircularProgress from "@mui/material/CircularProgress";
-import { getUserById, getConnectedUser } from "../controleurs/CompteControleur";
+import { getUserById } from "../controleurs/CompteControleur";
 import { CompteModel } from "../Models/CompteModel";
 import { storage } from "../Helpers/FireBase";
 import { createUUID } from "../Helpers/Helper";
 import { Grid } from "@mui/material";
 import { styled } from "@mui/material/styles";
+import { getConnectedUser } from "../Helpers/FireBase";
 const theme = createTheme();
 
 export default function AjouterPointVente() {
@@ -45,24 +46,28 @@ export default function AjouterPointVente() {
   useEffect(() => {
     console.log("use effect here");
 
-    const jsonUser = getConnectedUser();
-    console.log("jsonUser", jsonUser);
-    getUserById(jsonUser.uid)
-      .then((snapshot) => {
-        let values = snapshot.data();
-        setLoading(false);
-        const compte = new CompteModel(
-          values.id,
-          values.nom,
-          values.prenom,
-          values.email
-        );
-        setUser(compte);
-        console.log("compteUser", compte);
-      })
-      .catch((error) => {
-        console.error("Error : ", error);
-      });
+    getConnectedUser().then((_user) => {
+      console.log("_user", _user);
+      const jsonUser = _user;
+      console.log("jsonUser", jsonUser);
+      getUserById(jsonUser.uid)
+        .then((snapshot) => {
+          let values = snapshot.data();
+          setLoading(false);
+          const compte = new CompteModel(
+            values.id,
+            values.nom,
+            values.prenom,
+            values.type,
+            values.email
+          );
+          setUser(compte);
+          console.log("compteUser", compte);
+        })
+        .catch((error) => {
+          console.error("Error : ", error);
+        });
+    });
   }, []);
   const handleChangeImagePtv = (e) => {
     if (e.target.files[0]) {
@@ -149,19 +154,19 @@ export default function AjouterPointVente() {
       numerotlf: data.get("numerotlf"),
       urlImagePtv: url,
     };
-    if (isFormValid(dataValues)) {
-      console.log("form valid");
-      ajouterPointVente(dataValues)
-        .then(() => {
-          console.log("point de vente est ajouté");
-          alert("Votre point de vente est ajouté avec avec succès");
-          console.log("______ ", dataValues);
-          navigate("/consulter/pointsvente");
-        })
-        .catch(() => {
-          console.log("something went wrong !! ");
-        });
-    } else console.log("form nom valid");
+    /*if (isFormValid(dataValues)) {
+      console.log("form valid");*/
+    ajouterPointVente(dataValues)
+      .then(() => {
+        console.log("point de vente est ajouté");
+        alert("Votre point de vente est ajouté avec avec succès");
+        console.log("______ ", dataValues);
+        navigate("/consulter/pointsvente");
+      })
+      .catch(() => {
+        console.log("something went wrong !! ");
+      });
+    /* } else console.log("form nom valid");*/
   };
 
   return (

@@ -28,7 +28,7 @@ import ListAltIcon from "@mui/icons-material/ListAlt";
 import AddBusinessIcon from "@mui/icons-material/AddBusiness";
 import LogoutIcon from "@mui/icons-material/Logout";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-
+import { Deconnexion } from "../controleurs/CompteControleur";
 
 const drawerWidth = 240;
 
@@ -267,7 +267,7 @@ export default function Menu({ children }) {
         <ListItem
           button
           onClick={() => {
-            navigate("/connexion");
+            Deconnexion(navigate("/connexion"));
           }}
         >
           <ListItemIcon>

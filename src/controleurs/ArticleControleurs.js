@@ -1,17 +1,13 @@
 import { db } from "../Helpers/FireBase";
 import { ArticleModel } from "../Models/ArticleModel";
-import { storage } from "../Helpers/FireBase";
-import { getConnectedUser } from "./CompteControleur";
 
 export function ajouterArticle(data) {
-  let user = getConnectedUser();
   let docRef = db.collection("Articles").doc();
   let articleId = docRef.id;
   data.id = articleId;
-  let idCommercant = user.uid;
   let articleToAdd = new ArticleModel(
     articleId,
-    idCommercant,
+    data.idCommercant,
     data.titreArticle,
     data.typeArticle,
     data.urlImage,
@@ -29,7 +25,6 @@ export function ajouterArticle(data) {
   );
   console.log(articleToAdd);
   return docRef.set(Object.assign({}, articleToAdd));
-  //return docRef.set(data);
 }
 //recuperer article by commercant id("123") ---->id commercant ->
 

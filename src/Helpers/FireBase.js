@@ -28,4 +28,15 @@ const storage = firebase.storage();
 export { storage };
 
 export const auth = firebase.auth();
-export const user = firebase.auth().currentUser;
+
+export function getConnectedUser() {
+  return new Promise((resolve, reject) => {
+    if (auth.currentUser) {
+      resolve(auth.currentUser);
+    }
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      unsubscribe();
+      resolve(user);
+    }, reject);
+  });
+}

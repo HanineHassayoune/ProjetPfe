@@ -64,6 +64,10 @@ const Unite = [
     label: "cl",
   },
   {
+    value: "boite",
+    label: "boite",
+  },
+  {
     value: "Autre",
     label: "Autre",
   },
@@ -233,9 +237,12 @@ export default function ModifierArticle() {
     const _errors = { ...errors };
     if (!data.titreArticle) {
       _errors.titreArticle = "Titre  est obligatoire";
-    } else if (!regNom.test(data.titreArticle)) {
+    } /*else if (!regNom.test(data.titreArticle)) {
       _errors.titreArticle = "Titre contient uniquement des lettres ";
-    } else _errors.titreArticle = "";
+    }*/ else _errors.titreArticle = "";
+    if (!data.typeArticle) {
+      _errors.typeArticle = "Type article est obligatoire";
+    } else _errors.typeArticle = "";
 
     if (!data.nomPointVente) {
       _errors.nomPointVente = "Nom point vente est obligatoire";
@@ -380,8 +387,8 @@ export default function ModifierArticle() {
                         id="typeArticle"
                         label="Type article"
                         autoComplete="typeArticle"
-                        //error={errors.typeArticle ? true : false}
-                        //helperText={errors.typeArticle}
+                        error={errors.typeArticle ? true : false}
+                        helperText={errors.typeArticle}
                         value={data.typeArticle}
                         name="typeArticle"
                         onChange={(e) => handleChange(e)}
@@ -520,13 +527,11 @@ export default function ModifierArticle() {
                       <LocalizationProvider dateAdapter={AdapterDateFns}>
                         <DatePicker
                           label="Date de validité"
-                          value={dateV}
+                          value={data.datevalidite}
                           onChange={(newDateV) => {
                             setDateV(newDateV);
                           }}
-                          renderInput={(params) => (
-                            <TextField {...params} value={data.datevalidite} />
-                          )}
+                          renderInput={(params) => <TextField {...params} />}
                         />
                       </LocalizationProvider>
                     </Grid>
@@ -549,7 +554,7 @@ export default function ModifierArticle() {
                       <LocalizationProvider dateAdapter={AdapterDateFns}>
                         <DatePicker
                           label="Date du retrait"
-                          value={dateR}
+                          value={data.dateretrait}
                           onChange={(newDateR) => {
                             setDateR(newDateR);
                           }}

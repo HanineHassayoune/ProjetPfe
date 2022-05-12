@@ -1,15 +1,15 @@
 import * as React from "react";
-import Alert from "@mui/material/Alert";
-import AlertTitle from "@mui/material/AlertTitle";
-import Stack from "@mui/material/Stack";
 
-export default function DescriptionAlerts() {
-  return (
-    <Stack sx={{ width: "100%" }} spacing={2}>
-      <Alert severity="success">
-        <AlertTitle>Success</AlertTitle>
-        This is a success alert — <strong>check it out!</strong>
-      </Alert>
-    </Stack>
-  );
+import Switch from "@mui/material/Switch";
+import { useState, useEffect } from "react";
+import FormControlLabel from "@mui/material/FormControlLabel";
+
+export default function SimpleFade() {
+  const [checked, setChecked] = useState(false);
+
+  const handleChange = () => {
+    setChecked((prev) => !prev);
+  };
+
+  return <Switch checked={checked} onChange={handleChange} color="secondary" />;
 }

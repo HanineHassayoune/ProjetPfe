@@ -23,14 +23,16 @@ import { getReservation } from "../controleurs/ReservationControleur";
 import { getListClientByListId } from "../controleurs/CompteControleur";
 import { getListArticlesByListId } from "../controleurs/ArticleControleurs";
 import { getListPointVenteByListId } from "../controleurs/PointDeVenteControleur";
+import CircularProgress from "@mui/material/CircularProgress";
+import Typography from "@mui/material/Typography";
+import { getReservationById } from "../controleurs/ReservationControleur";
+
+import { Button } from "@mui/material";
 
 const Statistique = () => {
-  const [client, setClient] = useState([]);
-  const [article, setArticle] = useState([]);
-
-  const [ptv, setPtv] = useState([]);
-
   const [rows, setRows] = useState([]);
+  const [selectId, setSelectId] = useState("");
+
   // Sample data
   const data = [
     { argument: "Lundi", value: 10 },
@@ -48,42 +50,101 @@ const Statistique = () => {
     { argument: "Thursday", value: 50 },
     { argument: "Friday", value: 60 },
   ];
+  const dt = null;
+
+  //date de retrait d'article
+  const [cdate, setDate] = useState(dt);
+  const handelDate = () => {
+    let dt = new Date().toLocaleDateString();
+    setDate(dt);
+    console.log("dttttt", dt);
+  };
+
+  //change statut d'article et quantité restante
+  const handleChange = (event, id) => {
+    event.preventDefault();
+    setSelectId(id);
+    console.log("idRow", id);
+
+    /*getReservationById(id)
+      .then((response) => {
+        console.log("Document ", response.data());
+        let qttReserve = response.data().quantiteReserve;
+        console.log("qttReserve", qttReserve);
+        let statutReserve = response.data().statutReservation;
+        console.log("statutReserve", statutReserve);
+      })
+      .catch((error) => {
+        console.error("Error : ", error);
+      });*/
+  };
+
   useEffect(() => {
     console.log("use effect here ");
+    // get list reservations
     getReservation()
       .then((response) => {
-        let reservation = response.docs.map((doc) => doc.data());
-        console.log("reservation", reservation);
-
-        let ListIdClients = reservation.map((res) => res.idClient);
+        let _reservations = response.docs.map((doc) => doc.data());
+        console.log("reservations", _reservations);
+        //get list id client from reservation
+        let ListIdClients = _reservations.map((res) => res.idClient);
         console.log("ListIdClients", ListIdClients);
-        getListClientByListId(ListIdClients).then((snapshot) => {
+        // get liste client from reservation
+        getListClientByListId([...new Set(ListIdClients)]).then((snapshot) => {
           let listClients = snapshot.docs.map((doc) => doc.data());
           console.log("listClients", listClients);
-          setClient(listClients);
-          console.log("client", client);
+
+          let ListIdArticles = _reservations.map((res) => res.idArticle);
+          console.log("ListIdArticles", ListIdArticles);
+          // get list article
+          getListArticlesByListId([...new Set(ListIdArticles)]).then(
+            (snapshot) => {
+              let listArticles = snapshot.docs.map((doc) => doc.data());
+              console.log("listArticles", listArticles);
+
+              let ListIdPtv = _reservations.map((res) => res.idPointVente);
+              console.log("ListIdPtv", ListIdPtv);
+
+              // get list pointvente
+              getListPointVenteByListId([...new Set(ListIdPtv)]).then(
+                (snapshot) => {
+                  let listPtv = snapshot.docs.map((doc) => doc.data());
+                  console.log("listPtv", listPtv);
+
+                  //get listqttReserve
+
+                  //construire array de reservation
+                  let _rows = [];
+                  for (let index = 0; index < _reservations.length; index++) {
+                    const element = _reservations[index];
+                    const item = {
+                      emailClient: listClients.find(
+                        (client) => client.id === element.idClient
+                      ).email,
+                      titreArticle: listArticles.find(
+                        (article) => article.id === element.idArticle
+                      ).titreArticle,
+                      quantiteArticle: listArticles.find(
+                        (quantite) => quantite.id === element.idArticle
+                      ).quantite,
+                      quantiteReserve: element.quantiteReserve,
+                      titrePointVente: listArticles.find(
+                        (ptv) => ptv.id === element.idArticle
+                      ).nomPointVente,
+                      statutReservation: element.statutReservation,
+                      dateReservation: element.dateReservation,
+                      idReservation: element.reserverId,
+                    };
+                    _rows.push(item);
+                    console.log(item);
+                  }
+                  setRows(_rows);
+                  console.log("_rows", _rows);
+                }
+              );
+            }
+          );
         });
-        let ListIdArticles = reservation.map((res) => res.idArticle);
-        console.log("ListIdArticles", ListIdArticles);
-
-        /*
-        getListArticlesByListId(ListIdArticles).then((snapshot) => {
-          let listArticles = snapshot.docs.map((doc) => doc.data());
-          console.log("listArticles", listArticles);
-          setArticle(listArticles);
-          console.log("article", article);
-        });
-        let ListIdPtv = reservation.map((res) => res.idPointVente);
-        console.log("ListIdPtv", ListIdPtv);
-
-
-
-        getListPointVenteByListId(ListIdPtv).then((snapshot) => {
-          let listPtv = snapshot.docs.map((doc) => doc.data());
-          console.log("listPtv", listPtv);
-          setPtv(listPtv);
-          console.log("ptv", ptv);
-        });*/
       })
       .catch((error) => {
         console.error("Error : ", error);
@@ -91,81 +152,94 @@ const Statistique = () => {
   }, []);
 
   return (
-    <>
-      <Grid container spacing={2}>
-        <Grid item xs={12} sm={6}>
-          <Paper elevation={3}>
-            <Chart data={data}>
-              <PieSeries valueField="value" argumentField="argument" />
-              <Title text="Articles par jour " />
-            </Chart>
-          </Paper>
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <Paper elevation={3}>
-            <Chart data={_data}>
-              <ArgumentAxis />
-              <ValueAxis />
-              <BarSeries valueField="value" argumentField="argument" />
-            </Chart>
-          </Paper>
-        </Grid>
+    <Grid container spacing={2}>
+      <Grid item xs={12} sm={6}>
+        <Paper elevation={3}>
+          <Chart data={data}>
+            <PieSeries valueField="value" argumentField="argument" />
+            <Title text="Articles par jour " />
+          </Chart>
+        </Paper>
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <Paper elevation={3}>
+          <Chart data={_data}>
+            <ArgumentAxis />
+            <ValueAxis />
+            <BarSeries valueField="value" argumentField="argument" />
+          </Chart>
+        </Paper>
+      </Grid>
 
-        <Grid item xs={12}>
-          <TableContainer component={Paper}>
-            <Table sx={{ minWidth: 650 }} aria-label="simple table">
-              <TableHead>
-                <TableRow>
-                  <TableCell align="center" bgcolor="#e3f2fd">
-                    Email client
-                  </TableCell>
-                  <TableCell align="center" bgcolor="#e3f2fd">
-                    Titre article
-                  </TableCell>
-                  <TableCell align="center" bgcolor="#e3f2fd">
-                    Quantité article
-                  </TableCell>
-                  <TableCell align="center" bgcolor="#e3f2fd">
-                    Nombre de reservation
-                  </TableCell>
-                  <TableCell align="center" bgcolor="#e3f2fd">
-                    Titre point vente
+      <Grid item xs={12}>
+        <TableContainer component={Paper}>
+          <Table sx={{ minWidth: 650 }} aria-label="simple table">
+            <TableHead>
+              <TableRow>
+                <TableCell align="center" bgcolor="#e3f2fd">
+                  Email client
+                </TableCell>
+                <TableCell align="center" bgcolor="#e3f2fd">
+                  Titre article
+                </TableCell>
+                <TableCell align="center" bgcolor="#e3f2fd">
+                  Quantité disponible
+                </TableCell>
+                <TableCell align="center" bgcolor="#e3f2fd">
+                  Quantité reservé
+                </TableCell>
+                <TableCell align="center" bgcolor="#e3f2fd">
+                  Titre point vente
+                </TableCell>
+
+                <TableCell align="center" bgcolor="#e3f2fd">
+                  Statut
+                </TableCell>
+                <TableCell align="center" bgcolor="#e3f2fd">
+                  Date réservation
+                </TableCell>
+                <TableCell align="center" bgcolor="#e3f2fd">
+                  Id réservation
+                </TableCell>
+                <TableCell align="center" bgcolor="#e3f2fd">
+                  Action
+                </TableCell>
+              </TableRow>
+            </TableHead>
+
+            <TableBody>
+              {rows.map((row, id) => (
+                <TableRow
+                  key={id}
+                  sx={{
+                    "&:last-child td, &:last-child th": { border: 0 },
+                  }}
+                >
+                  <TableCell align="center">{row.emailClient}</TableCell>
+                  <TableCell align="center">{row.titreArticle}</TableCell>
+                  <TableCell align="center">{row.quantiteArticle}</TableCell>
+                  <TableCell align="center">{row.quantiteReserve}</TableCell>
+                  <TableCell align="center">{row.titrePointVente}</TableCell>
+                  <TableCell align="center">{row.statutReservation}</TableCell>
+                  <TableCell align="center">{row.dateReservation}</TableCell>
+                  <TableCell align="center">{row.idReservation}</TableCell>
+                  <TableCell align="center">
+                    <Button
+                      variant="contained"
+                      onClick={(event) => {
+                        handleChange(event, row.idReservation);
+                      }}
+                    >
+                      Retirer
+                    </Button>
                   </TableCell>
                 </TableRow>
-              </TableHead>
-
-              <TableBody>
-                {client.map((row, id) => (
-                  <TableRow
-                    key={id}
-                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                  >
-                    <TableCell align="center">{row.email}</TableCell>
-                  </TableRow>
-                ))}
-                {article.map((row, id) => (
-                  <TableRow
-                    key={id}
-                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                  >
-                    <TableCell align="center">{row.titreArticle}</TableCell>
-                    <TableCell align="center">{row.quantite}</TableCell>
-                  </TableRow>
-                ))}
-                {ptv.map((row, id) => (
-                  <TableRow
-                    key={id}
-                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                  >
-                    <TableCell align="center">{row.titrePointVente}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Grid>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
       </Grid>
-    </>
+    </Grid>
   );
 };
 

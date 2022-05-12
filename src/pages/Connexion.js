@@ -73,10 +73,10 @@ export default function Connexion() {
     console.log("user", user);
     console.log(" user.id", user.uid);
     let _user = await getUserById(user.uid);
-    if (_user.exists) {
+    console.log("Hello connected user", _user.data().type.toUpperCase());
+    if (_user.exists && _user.data().type.toUpperCase() == "COMMERCANT") {
       _user.data();
       console.log("_user", _user.data());
-
       navigate("/statistique");
     } else {
       console.log("user n'existe pas");
