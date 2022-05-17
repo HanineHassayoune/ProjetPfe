@@ -17,8 +17,16 @@ import Button from "@mui/material/Button";
 import CancelIcon from "@mui/icons-material/Cancel";
 import ReportProblemIcon from "@mui/icons-material/ReportProblem";
 import { consulterListeArticles } from "../controleurs/ArticleControleurs";
-import { deleteArticle } from "../controleurs/ArticleControleurs";
+import {
+  deleteArticle,
+  deleteArticleFromPointVente,
+} from "../controleurs/ArticleControleurs";
 import CircularProgress from "@mui/material/CircularProgress";
+import { consulterListePointsVente } from "../controleurs/PointDeVenteControleur";
+import {
+  getReservation,
+  deleteReservation,
+} from "../controleurs/ReservationControleur";
 
 //conposant react
 export default function ConsulterArticles() {
@@ -36,10 +44,11 @@ export default function ConsulterArticles() {
     p: 4,
   };
 
-  //consulter liste des articles
   const [rows, setRows] = useState([]);
+  const [deletedArticle, setDeletedArticle] = useState();
   useEffect(() => {
     console.log("use effect here");
+    //consulter liste articles
     consulterListeArticles().then((snapshot) => {
       console.log(snapshot);
       let values = snapshot.docs.map((doc) => doc.data());
@@ -51,11 +60,44 @@ export default function ConsulterArticles() {
   }, []);
 
   const [selectId, setSelectId] = useState("");
-  //supprimer article
+  //supprimer article from all collection
   const supprimerArticle = () => {
+    //consulter liste des point de vente
+    consulterListePointsVente().then((result) => {
+      let listPointVente = result.docs.map((doc) => doc.data());
+      console.log("listPointVente", listPointVente);
+      const listIdArticles = listPointVente.map((list) => {
+        console.log("list idArticles avant filter ", list);
+        const result = list.idArticles.filter((element) => selectId != element);
+        list.idArticles = result;
+        console.log("fresh list", list);
+        //delete article from point vente apres suppression article from collection articles
+        deleteArticleFromPointVente(list).then((response) =>
+          console.log("response", response)
+        );
+        console.log("list idArticles apres filter", result);
+      });
+    });
+    //get reservation
+    getReservation().then((res) => {
+      let listReservation = res.docs.map((doc) => doc.data());
+      console.log("listReservation", listReservation);
+      const result = listReservation.filter(
+        (element) => element.idArticle == selectId
+      );
+      console.log("Result ", result);
+      //supprimer reservation apres delete article
+      deleteReservation(result).then((val) => console.log("val", val));
+    });
+    //delete article from collection articles
     deleteArticle(selectId)
       .then(() => {
         console.log("Document successfully deleted!");
+        //window.location.reload(true);
+        deleteArticleFromPointVente().then((response) => {
+          console.log(response);
+          console.log("article successfully deleted from ptv!");
+        });
       })
       .catch((error) => {
         console.error("Error removing document: ", error);
@@ -129,11 +171,12 @@ export default function ConsulterArticles() {
                       Date du retrait
                     </TableCell>
                     <TableCell align="center" bgcolor="#e3f2fd">
-                      Statut
+                      Statut d'article
                     </TableCell>
                     <TableCell align="center" bgcolor="#e3f2fd">
                       Description
                     </TableCell>
+
                     <TableCell align="center" bgcolor="#e3f2fd">
                       Action
                     </TableCell>
@@ -156,18 +199,23 @@ export default function ConsulterArticles() {
                       <TableCell align="center">{row.prixInitial}</TableCell>
                       <TableCell align="center">{row.prixActuel}</TableCell>
                       <TableCell align="center">{row.unite}</TableCell>
-                      <TableCell align="center">{row.quantite}</TableCell>
+                      <TableCell align="center" bgcolor="#e3f2fd">
+                        {row.quantite}
+                      </TableCell>
                       <TableCell align="center">{row.datevalidite}</TableCell>
                       <TableCell align="center">{row.dateretrait}</TableCell>
                       <TableCell align="center">{row.statut}</TableCell>
                       <TableCell align="center">{row.description}</TableCell>
+
                       <TableCell align="center">
                         <IconButton
+                          color="primary"
                           onClick={(event) => {
                             handleOpen(event, row.id);
                           }}
+                          disabled={parseInt(row.quantite) === 0 ? false : true}
                         >
-                          <DeleteIcon color="primary" />
+                          <DeleteIcon />
                         </IconButton>
                         <IconButton
                           onClick={() => {

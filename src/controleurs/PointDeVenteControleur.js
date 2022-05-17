@@ -12,6 +12,8 @@ export function ajouterPointVente(data) {
     idArticles,
     data.titrePointVente,
     data.adressePointVente,
+    data.latitude,
+    data.longitude,
     data.email,
     data.numerotlf,
     data.urlImagePtv

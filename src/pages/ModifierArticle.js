@@ -103,8 +103,7 @@ export default function ModifierArticle() {
   const [loading, setLoading] = useState(true);
   const [dateV, setDateV] = useState(null);
   const [dateR, setDateR] = useState(null);
-  const [typeArticle, setTypeArticle] = useState("");
-  const regNum = new RegExp("^[0-9\b]+$");
+  const regNum = new RegExp("^[0-9]+|[0-9]+[,|.][0-9]+$");
   const regNom = new RegExp("^[a-zA-Z]+[a-zA-Z]+$");
   const [image, setImage] = useState(null);
   const [url, setUrl] = useState("");
@@ -232,68 +231,62 @@ export default function ModifierArticle() {
     );
   };
 
-  //validation form
+  // validation formulaire
   const isFormValid = (data) => {
     const _errors = { ...errors };
+    //verifier titre article
     if (!data.titreArticle) {
       _errors.titreArticle = "Titre  est obligatoire";
-    } /*else if (!regNom.test(data.titreArticle)) {
+    } else if (!regNom.test(data.titreArticle)) {
       _errors.titreArticle = "Titre contient uniquement des lettres ";
-    }*/ else _errors.titreArticle = "";
+    } else _errors.titreArticle = "";
     if (!data.typeArticle) {
       _errors.typeArticle = "Type article est obligatoire";
     } else _errors.typeArticle = "";
 
-    if (!data.nomPointVente) {
-      _errors.nomPointVente = "Nom point vente est obligatoire";
-    } else if (!regNom.test(data.nomPointVente)) {
-      _errors.nomPointVente = "Nom contient uniquement des lettres ";
-    } else _errors.nomPointVente = "";
-
-    if (!data.nomCommercant) {
-      _errors.nomCommercant = "Nom commerçant est obligatoire";
-    } else if (!regNom.test(data.nomCommercant)) {
-      _errors.nomCommercant = "Nom contient uniquement des lettres ";
-    } else _errors.nomCommercant = "";
-
+    //verifier prix initial d'article
     if (!data.prixInitial) {
       _errors.prixInitial = "Prix initial est obligatoire";
     } else if (!regNum.test(data.prixInitial)) {
       _errors.prixInitial = "Prix initial contient uniquement des chiffres ";
     } else _errors.prixInitial = "";
-
+    //verifier prix actuel d'article
     if (!data.prixActuel) {
       _errors.prixActuel = "Prix actuel est obligatoire";
     } else if (!regNum.test(data.prixActuel)) {
       _errors.prixActuel = "Prix actuel contient uniquement des chiffres ";
     } else _errors.prixActuel = "";
-
+    //verifier quantité
     if (!data.quantite) {
       _errors.quantite = "Quantité est obligatoire";
     } else if (!regNum.test(data.quantite)) {
       _errors.quantite = "Quantité contient uniquement des chiffres ";
     } else _errors.quantite = "";
-
+    //verifier unité
     if (!data.unite) {
       _errors.unite = "Unité est obligatoire";
     } else _errors.unite = "";
-
+    //verifier date de validité
     if (!data.datevalidite) {
       _errors.datevalidite = "Date de validité est obligatoire";
     } else _errors.datevalidite = "";
-
+    //verifier date de retrait
     if (!data.dateretrait) {
       _errors.dateretrait = "Date de retrait est obligatoire";
     } else _errors.dateretrait = "";
-
+    //verifier statut d'article
     if (!data.statut) {
-      _errors.statut = "Statut est obligatoire";
+      _errors.statut = "Selectionner le statut ";
     } else _errors.statut = "";
-
+    //verifier description
     if (!data.description) {
       _errors.description = "Description est obligatoire";
     } else _errors.description = "";
-
+    //verifier image
+    if (!data.urlImage) {
+      _errors.urlImage = "image est obligatoire";
+    } else _errors.urlImage = "";
+    //set errors
     setErrors(_errors);
     if (Object.values(_errors).filter((item) => item).length === 0) {
       return true;
@@ -411,8 +404,8 @@ export default function ModifierArticle() {
                         label="Nom point de vente"
                         name="nomPointVente"
                         autoComplete="nomPointVente"
-                        error={errors.nomPointVente ? true : false}
-                        helperText={errors.nomPointVente}
+                        //error={errors.nomPointVente ? true : false}
+                        //helperText={errors.nomPointVente}
                         disabled
                         //onChange={(e) => handleChange(e)}
                         value={data.nomPointVente}
@@ -430,8 +423,8 @@ export default function ModifierArticle() {
                         //autoComplete="nomCommercant"
                         disabled
                         error={errors.nomCommercant ? true : false}
-                        helperText={errors.nomCommercant}
-                        onChange={(e) => handleChange(e)}
+                        //helperText={errors.nomCommercant}
+                        //onChange={(e) => handleChange(e)}
                         value={data.nomCommercant}
                       />
                     </Grid>

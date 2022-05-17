@@ -53,6 +53,7 @@ export default function ConsulterPointsVente() {
     deletePointVente(selectId)
       .then(() => {
         console.log("Document successfully deleted!");
+        window.location.reload(true);
       })
       .catch((error) => {
         console.error("Error removing document: ", error);
@@ -115,13 +116,13 @@ export default function ConsulterPointsVente() {
                 <TableCell align="center">{row.numerotlf}</TableCell>
 
                 <TableCell align="center">
-                  <IconButton
+                  {/*<IconButton
                     onClick={(event) => {
                       handleOpen(event, row.id);
                     }}
                   >
                     <DeleteIcon color="primary" />
-                  </IconButton>
+                  </IconButton>*/}
                   <IconButton
                     onClick={() => {
                       navigate("/modifier/pointvente/" + row.id);

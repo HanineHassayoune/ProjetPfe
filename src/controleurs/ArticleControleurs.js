@@ -37,6 +37,11 @@ export function deleteArticle(id) {
   var docRef = db.collection("Articles");
   return docRef.doc(id).delete();
 }
+export function deleteArticleFromPointVente(data) {
+  console.log("Data controller ptv article ", data);
+  var docRef = db.collection("PointsDeVente");
+  return docRef.doc(data.id).update(data);
+}
 
 export function getArticleById(id) {
   var docRef = db.collection("Articles");

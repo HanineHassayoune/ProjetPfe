@@ -15,7 +15,8 @@ export function creerCompte(data) {
         data.nom,
         data.prenom,
         type,
-        data.email
+        data.email,
+        data.numerotlf
       );
       console.log("compteToAdd", compteToAdd);
       return docRef.set(Object.assign({}, compteToAdd));
@@ -70,3 +71,16 @@ export function Deconnexion() {
       console.error("Error : ", error);
     });
 }
+
+/*export const forgotPassword = (Email) => {
+  firebase
+    .auth()
+    .sendPasswordResetEmail(Email)
+    .then(function (user) {
+      alert("Please check your email...");
+    })
+    .catch(function (e) {
+      console.log(e);
+    });
+};
+*/

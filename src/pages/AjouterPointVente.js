@@ -23,6 +23,9 @@ import { getConnectedUser } from "../Helpers/FireBase";
 const theme = createTheme();
 
 export default function AjouterPointVente() {
+  const navigate = useNavigate();
+  const regNom = new RegExp("^[a-zA-Z]+ [a-zA-Z]+|[a-zA-Z]+$");
+  const regNum = new RegExp("^[0-9]+.[0-9]+|[0-9\b]+$");
   const [loading, setLoading] = useState(true);
   const [url, setUrl] = useState("");
   const [progress, setProgress] = useState(0);
@@ -43,13 +46,15 @@ export default function AjouterPointVente() {
     prenom: "",
     email: "",
   });
+
   useEffect(() => {
     console.log("use effect here");
-
+    //get connected user
     getConnectedUser().then((_user) => {
       console.log("_user", _user);
       const jsonUser = _user;
       console.log("jsonUser", jsonUser);
+      //get user by id
       getUserById(jsonUser.uid)
         .then((snapshot) => {
           let values = snapshot.data();
@@ -59,7 +64,8 @@ export default function AjouterPointVente() {
             values.nom,
             values.prenom,
             values.type,
-            values.email
+            values.email,
+            values.numerotlf
           );
           setUser(compte);
           console.log("compteUser", compte);
@@ -69,6 +75,8 @@ export default function AjouterPointVente() {
         });
     });
   }, []);
+
+  //ajouter image pour point de vente
   const handleChangeImagePtv = (e) => {
     if (e.target.files[0]) {
       setImage(e.target.files[0]);
@@ -77,6 +85,7 @@ export default function AjouterPointVente() {
     }
   };
 
+  //telecharger image
   const handleUpload = (_image) => {
     let imageName = createUUID() + _image.name;
     const uploadTask = storage.ref(`images/${imageName}`).put(_image);
@@ -107,43 +116,39 @@ export default function AjouterPointVente() {
     );
   };
 
-  const navigate = useNavigate();
-  const pattern = new RegExp("^[a-zA-Z0-9]+@[a-zA-Z0-9]+[.][A-Za-z]+$");
-  const regNom = new RegExp("^[a-zA-Z]+[a-zA-Z]+$");
-  const regNum = new RegExp("^[0-9\b]+$");
   //validation formulaire
   const isFormValid = (data) => {
     const _errors = { ...errors };
+    //verifier titre point de vente
     if (!data.titrePointVente) {
       _errors.titrePointVente = "Titre est obligatoire";
     } else if (!regNom.test(data.titrePointVente)) {
       _errors.titrePointVente = "Le titre doit contenir seulement des lettres";
     } else _errors.titrePointVente = "";
-
-    if (!data.email) {
-      _errors.email = "Email est obligatoire";
-    } else if (!pattern.test(data.email)) {
-      _errors.email = "Vérifier votre email";
-    } else _errors.email = "";
-
+    //verifier adresse point de vente
     if (!data.adressePointVente) {
       _errors.adressePointVente = "Adresse est obligatoire";
     } else _errors.adressePointVente = "";
-
-    if (!data.numerotlf) {
-      _errors.numerotlf = "Numero téléphone est obligatoire";
-    } else if (!regNum.test(data.numerotlf)) {
-      _errors.numerotlf = "Le numéro doit contenir seulement des chiffres";
-    } else if (!data.numerotlf.length === 8) {
-      _errors.numerotlf = "Le numéro doit contenir 8 chiffres";
-    } else _errors.numerotlf = "";
-
+    //verifier latitude point de vente
+    if (!data.latitude) {
+      _errors.latitude = "Latitude est obligatoire";
+    } else if (!regNum.test(data.latitude)) {
+      _errors.latitude = "Latitude doit contenir seulement des chiffres";
+    } else _errors.latitude = "";
+    //verifier longitude point de vente
+    if (!data.longitude) {
+      _errors.longitude = "Longitude est obligatoire";
+    } else if (!regNum.test(data.longitude)) {
+      _errors.longitude = "Longitude doit contenir seulement des chiffres";
+    } else _errors.longitude = "";
+    //set error
     setErrors(_errors);
     if (Object.values(_errors).filter((item) => item).length === 0) {
       return true;
     } else return false;
   };
 
+  //submit form after validation
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -151,22 +156,25 @@ export default function AjouterPointVente() {
       titrePointVente: data.get("titrePointVente"),
       email: user.email,
       adressePointVente: data.get("adressePointVente"),
-      numerotlf: data.get("numerotlf"),
+      latitude: data.get("latitude"),
+      longitude: data.get("longitude"),
+      numerotlf: user.numerotlf,
       urlImagePtv: url,
     };
-    /*if (isFormValid(dataValues)) {
-      console.log("form valid");*/
-    ajouterPointVente(dataValues)
-      .then(() => {
-        console.log("point de vente est ajouté");
-        alert("Votre point de vente est ajouté avec avec succès");
-        console.log("______ ", dataValues);
-        navigate("/consulter/pointsvente");
-      })
-      .catch(() => {
-        console.log("something went wrong !! ");
-      });
-    /* } else console.log("form nom valid");*/
+    //ajouter point de vente after validation form
+    if (isFormValid(dataValues)) {
+      console.log("form valid");
+      ajouterPointVente(dataValues)
+        .then(() => {
+          console.log("point de vente est ajouté");
+          alert("Votre point de vente est ajouté avec avec succès");
+          console.log("______ ", dataValues);
+          navigate("/consulter/pointsvente");
+        })
+        .catch(() => {
+          console.log("something went wrong !! ");
+        });
+    } else console.log("form nom valid");
   };
 
   return (
@@ -234,6 +242,32 @@ export default function AjouterPointVente() {
                         autoComplete="adressePointVente"
                       />
                     </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        id="latitude"
+                        label="Latitude"
+                        name="latitude"
+                        error={errors.latitude ? true : false}
+                        helperText={errors.latitude}
+                        autoComplete="latitude"
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        id="longitude"
+                        label="Longitude "
+                        name="longitude"
+                        error={errors.longitude ? true : false}
+                        helperText={errors.longitude}
+                        autoComplete="longitude"
+                      />
+                    </Grid>
                     <Grid item xs={12}>
                       <TextField
                         margin="normal"
@@ -243,9 +277,6 @@ export default function AjouterPointVente() {
                         label="Email"
                         type="email"
                         id="email"
-                        error={errors.email ? true : false}
-                        helperText={errors.email}
-                        // autoComplete="email"
                         disabled
                         value={user.email}
                       />
@@ -258,9 +289,8 @@ export default function AjouterPointVente() {
                         id="numerotlf"
                         label="Numéro téléphone"
                         name="numerotlf"
-                        error={errors.numerotlf ? true : false}
-                        helperText={errors.numerotlf}
-                        autoComplete="numerotlf"
+                        disabled
+                        value={user.numerotlf}
                       />
                     </Grid>
                     <Grid item xs={12}>

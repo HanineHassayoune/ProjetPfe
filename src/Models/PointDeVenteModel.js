@@ -4,6 +4,8 @@ export class PointDeVenteModel {
     idArticles,
     titrePointVente,
     adressePointVente,
+    latitude,
+    longitude,
     email,
     numerotlf,
     urlImagePtv
@@ -12,6 +14,8 @@ export class PointDeVenteModel {
     this.idArticles = idArticles;
     this.titrePointVente = titrePointVente;
     this.adressePointVente = adressePointVente;
+    this.latitude=latitude;
+    this.longitude=longitude;
     this.email = email;
     this.numerotlf = numerotlf;
     this.urlImagePtv = urlImagePtv;

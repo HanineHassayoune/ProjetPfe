@@ -60,6 +60,8 @@ export default function TransferList() {
           values.idArticles,
           values.titrePointVente,
           values.adressePointVente,
+          values.latitude,
+          values.longitude,
           values.email,
           values.numerotlf,
           values.urlImagePtv

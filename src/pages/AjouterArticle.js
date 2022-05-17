@@ -25,6 +25,7 @@ import { useNavigate } from "react-router-dom";
 import { getConnectedUser } from "../Helpers/FireBase";
 import { getUserById } from "../controleurs/CompteControleur";
 import { CompteModel } from "../Models/CompteModel";
+import Alert from "@mui/material/Alert";
 
 const status = [
   {
@@ -102,6 +103,8 @@ const TypesArticle = [
   },
 ];
 export default function Ajouter() {
+  const regNum = new RegExp("^[0-9]+|[0-9]+[,|.][0-9]+$");
+  const regNom = new RegExp("^[a-zA-Z]+ [a-zA-Z]+|[a-zA-Z]+$");
   const [statutArticle, setStatutArticle] = useState("");
   const [typeArticle, setTypeArticle] = useState("");
   const [uniteArticle, setUniteArticle] = useState("");
@@ -145,6 +148,7 @@ export default function Ajouter() {
 
   useEffect(() => {
     console.log("use effect here");
+    //consulter liste des points de vente (nomPointVente)
     consulterListePointsVente().then((snapshot) => {
       console.log(snapshot);
       let values = snapshot.docs.map((doc) => doc.data());
@@ -160,10 +164,12 @@ export default function Ajouter() {
 
       console.log("listPTV  :", listPTV);
     });
+    //get connected user
     getConnectedUser().then((_user) => {
       console.log("_user", _user);
       const jsonUser = _user;
       console.log("jsonUser", jsonUser);
+      //get user by id
       getUserById(jsonUser.uid)
         .then((snapshot) => {
           let values = snapshot.data();
@@ -184,16 +190,19 @@ export default function Ajouter() {
     });
   }, []);
 
+  //handleChange statut article
   const handleChange = (event) => {
     setStatutArticle(event.target.value);
   };
+  //handleChange unite d'artilce
   const handleChangeUnite = (event) => {
     setUniteArticle(event.target.value);
   };
+  //handleChange type d'artilce
   const handleChangeTypeArticle = (event) => {
     setTypeArticle(event.target.value);
   };
-
+  //handleChange nom point de vente
   const handleChangePtv = (event) => {
     console.log("avant filter", listPTV);
     let item = listPTV.find((el) => el.value === event.target.value);
@@ -205,7 +214,6 @@ export default function Ajouter() {
   };
 
   //ajouter image
-
   const handleChangeImage = (e) => {
     if (e.target.files[0]) {
       setImage(e.target.files[0]);
@@ -244,12 +252,10 @@ export default function Ajouter() {
     );
   };
 
-  const regNum = new RegExp("^[0-9\b]+$");
-  const regNom = new RegExp("^[a-zA-Z]+ [a-zA-Z]+|[a-zA-Z]+$");
-
   // validation formulaire
   const isFormValid = (data) => {
     const _errors = { ...errors };
+    //verifier titre article
     if (!data.titreArticle) {
       _errors.titreArticle = "Titre  est obligatoire";
     } else if (!regNom.test(data.titreArticle)) {
@@ -258,47 +264,53 @@ export default function Ajouter() {
     if (!data.typeArticle) {
       _errors.typeArticle = "Type article est obligatoire";
     } else _errors.typeArticle = "";
+    // verifier nom point de vente
     if (!data.nomPointVente) {
       _errors.nomPointVente = "Nom point vente est obligatoire";
     } else _errors.nomPointVente = "";
-
+    //verifier prix initial d'article
     if (!data.prixInitial) {
       _errors.prixInitial = "Prix initial est obligatoire";
     } else if (!regNum.test(data.prixInitial)) {
       _errors.prixInitial = "Prix initial contient uniquement des chiffres ";
     } else _errors.prixInitial = "";
+    //verifier prix actuel d'article
     if (!data.prixActuel) {
       _errors.prixActuel = "Prix actuel est obligatoire";
     } else if (!regNum.test(data.prixActuel)) {
       _errors.prixActuel = "Prix actuel contient uniquement des chiffres ";
     } else _errors.prixActuel = "";
-
+    //verifier quantité
     if (!data.quantite) {
       _errors.quantite = "Quantité est obligatoire";
     } else if (!regNum.test(data.quantite)) {
       _errors.quantite = "Quantité contient uniquement des chiffres ";
     } else _errors.quantite = "";
-
+    //verifier unité
     if (!data.unite) {
       _errors.unite = "Unité est obligatoire";
     } else _errors.unite = "";
-
+    //verifier date de validité
     if (!data.datevalidite) {
       _errors.datevalidite = "Date de validité est obligatoire";
     } else _errors.datevalidite = "";
-
+    //verifier date de retrait
     if (!data.dateretrait) {
       _errors.dateretrait = "Date de retrait est obligatoire";
     } else _errors.dateretrait = "";
-
+    //verifier statut d'article
     if (!data.statut) {
       _errors.statut = "Selectionner le statut ";
     } else _errors.statut = "";
-
+    //verifier description
     if (!data.description) {
       _errors.description = "Description est obligatoire";
     } else _errors.description = "";
-
+    //verifier image
+    if (!data.urlImage) {
+      _errors.urlImage = "image est obligatoire";
+    } else _errors.urlImage = "";
+    //set errors
     setErrors(_errors);
     if (Object.values(_errors).filter((item) => item).length === 0) {
       return true;
@@ -312,7 +324,7 @@ export default function Ajouter() {
 
     var date = moment(dateV).format("L");
     var _date = moment(dateR).format("L");
-
+    // data values of form
     const dataValues = {
       idCommercant: user.id,
       titreArticle: data.get("titreArticle"),
@@ -331,6 +343,7 @@ export default function Ajouter() {
       description: data.get("description"),
     };
     console.log("dataValues avant firebase", dataValues);
+    //ajouter article after validation form
     if (isFormValid(dataValues)) {
       console.log("form valid");
       console.log("______ ", dataValues);
@@ -338,8 +351,9 @@ export default function Ajouter() {
         .then(() => {
           console.log("article saved with succes");
           console.log("dataValues ", dataValues);
+          //ajouter des id articles to point vente [array d'id articles]
           setIdArticlesToPointVente(dataValues.idPointVente, [dataValues.id]);
-         
+          alert("votre article est ajouté avec succès");
           navigate("/consulter/articles");
         })
         .catch(() => {
@@ -539,7 +553,15 @@ export default function Ajouter() {
                           onChange={(newDateV) => {
                             setDateV(newDateV);
                           }}
-                          renderInput={(params) => <TextField {...params} />}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              // error
+                              // helperText="Your error message"
+                              error={errors.datevalidite ? true : false}
+                              helperText={errors.datevalidite}
+                            />
+                          )}
                         />
                       </LocalizationProvider>
                     </Grid>
@@ -563,7 +585,13 @@ export default function Ajouter() {
                           onChange={(newDateR) => {
                             setDateR(newDateR);
                           }}
-                          renderInput={(params) => <TextField {...params} />}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              error
+                              helperText="Your error message"
+                            />
+                          )}
                         />
                       </LocalizationProvider>
                     </Grid>

@@ -13,6 +13,7 @@ import { useState } from "react";
 import { creerCompte } from "../controleurs/CompteControleur";
 import Link from "@mui/material/Link";
 import { register } from "../controleurs/CompteControleur";
+import { useNavigate } from "react-router-dom";
 const theme = createTheme();
 
 export default function CreerCompte() {
@@ -20,47 +21,61 @@ export default function CreerCompte() {
     nom: "",
     prenom: "",
     email: "",
+    numerotlf: "",
     password: "",
   });
-  const regNom = new RegExp("^[a-zA-Z]+[a-zA-Z]+$");
+  const [form, setForm] = useState({
+    nom: "",
+    prenom: "",
+    email: "",
+    numerotlf: "",
+    password: "",
+  });
+  const navigate = useNavigate();
+  const regNom = new RegExp("^[a-zA-Z]+ [a-zA-Z]+|[a-zA-Z]+$");
   const pattern = new RegExp("^[a-zA-Z0-9]+@[a-zA-Z0-9]+.[A-Za-z]+$");
+  const regNum = new RegExp("^[0-9\b]+$");
   const isFormValid = (data) => {
     const _errors = { ...errors };
+    //verifier nom
     if (!data.nom) {
       _errors.nom = "Le nom est obligatoire";
     } else if (!regNom.test(data.nom)) {
       _errors.nom = "Le nom doit contenir seulement des lettres";
     } else _errors.nom = "";
-
+    //verifier prenom
     if (!data.prenom) {
       _errors.prenom = "Le prenom est obligatoire";
     } else if (!regNom.test(data.prenom)) {
       _errors.prenom = "Le prenom doit contenir seulement des lettres";
     } else _errors.prenom = "";
-
+    //verifier email
     if (!data.email) {
       _errors.email = "L'email est obligatoire";
     } else if (!pattern.test(data.email)) {
       _errors.email = "Vérifier votre email";
     } else _errors.email = "";
-
-    if (!data.password) {
+    //verifier numero telephone
+    if (!data.numerotlf) {
+      _errors.numerotlf = "Le numero téléphone est obligatoire";
+    } else if (!regNum.test(data.numerotlf)) {
+      _errors.numerotlf =
+        "Le numero téléphone doit contenir seulement des chiffres";
+    } else if (data.numerotlf.length != 8) {
+      _errors.numerotlf = "Le numero téléphone doit contenir 8 chiffres";
+    } else _errors.numerotlf = "";
+    //verifier password
+    /* if (!data.password) {
       _errors.password = "Le mots de passe est obligatoire";
     } else if (data.password.length < 6) {
       _errors.password = "Mots de passe doit etre superieure 6";
-    } else _errors.password = "";
+    } else _errors.password = "";*/
+    //set errors
     setErrors(_errors);
     if (Object.values(_errors).filter((item) => item).length === 0) {
       return true;
     } else return false;
   };
-
-  const [form, setForm] = useState({
-    nom: "",
-    prenom: "",
-    email: "",
-    password: "",
-  });
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -69,18 +84,20 @@ export default function CreerCompte() {
       nom: data.get("nom"),
       prenom: data.get("prenom"),
       email: data.get("email"),
+      numerotlf: data.get("numerotlf"),
     };
 
-    /* if (isFormValid(dataValues)) {
+    if (isFormValid(dataValues)) {
       console.log("form valid");
       await register(form);
-    await creerCompte(dataValues);
+      await creerCompte(dataValues);
+      navigate("/statistique");
     } else {
       console.log("form non valid");
-    }*/
+    }
 
-    await register(form);
-    await creerCompte(dataValues);
+    //await register(form);
+    //await creerCompte(dataValues);
 
     /*creerCompte(dataValues);
       .then(() => {
@@ -155,7 +172,6 @@ export default function CreerCompte() {
                 helperText={errors.prenom}
                 autoComplete="prenom"
               />
-
               <TextField
                 margin="normal"
                 required
@@ -168,6 +184,18 @@ export default function CreerCompte() {
                 autoComplete="email"
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
               />
+
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                id="numerotlf"
+                label="Numero téléphone"
+                name="numerotlf"
+                error={errors.numerotlf ? true : false}
+                helperText={errors.numerotlf}
+                autoComplete="numerotlf"
+              />
               <TextField
                 margin="normal"
                 required
@@ -176,9 +204,9 @@ export default function CreerCompte() {
                 label="Mots de passe"
                 type="password"
                 id="password"
-                //error={errors.password ? true : false}
+                // error={errors.password ? true : false}
                 //helperText={errors.password}
-                autoComplete="current-password"
+                // autoComplete="current-password"
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
               />
 

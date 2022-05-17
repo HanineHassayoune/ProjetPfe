@@ -21,135 +21,170 @@ import TableRow from "@mui/material/TableRow";
 import { useState, useEffect } from "react";
 import { getReservation } from "../controleurs/ReservationControleur";
 import { getListClientByListId } from "../controleurs/CompteControleur";
-import { getListArticlesByListId } from "../controleurs/ArticleControleurs";
+import {
+  getListArticlesByListId,
+  getArticleById,
+  updateArticle,
+} from "../controleurs/ArticleControleurs";
 import { getListPointVenteByListId } from "../controleurs/PointDeVenteControleur";
 import CircularProgress from "@mui/material/CircularProgress";
 import Typography from "@mui/material/Typography";
-import { getReservationById } from "../controleurs/ReservationControleur";
 
+import { updateReservation } from "../controleurs/ReservationControleur";
 import { Button } from "@mui/material";
 
 const Statistique = () => {
   const [rows, setRows] = useState([]);
-  const [selectId, setSelectId] = useState("");
 
   // Sample data
   const data = [
     { argument: "Lundi", value: 10 },
     { argument: "Mardi", value: 10 },
-    { argument: "Mercredi", value: 10 },
+    { argument: "Mercredi", value: 20 },
     { argument: "Jeudi", value: 20 },
     { argument: "Vendredi", value: 10 },
-    { argument: "Samedi", value: 10 },
-    { argument: "Dimanche", value: 20 },
+    { argument: "Samedi", value: 30 },
   ];
-  const _data = [
+  let diagrammeBatons = rows.map((elem) => ({
+    argument: elem.dateReservation,
+    value: elem.quantiteReserve,
+  }));
+
+  /*const diagrammeBatons = [
     { argument: "Monday", value: 30 },
     { argument: "Tuesday", value: 20 },
     { argument: "Wednesday", value: 10 },
     { argument: "Thursday", value: 50 },
     { argument: "Friday", value: 60 },
   ];
-  const dt = null;
-
-  //date de retrait d'article
-  const [cdate, setDate] = useState(dt);
-  const handelDate = () => {
-    let dt = new Date().toLocaleDateString();
-    setDate(dt);
-    console.log("dttttt", dt);
-  };
-
+*/
+  console.log("rowssssssssssssssssss", rows);
   //change statut d'article et quantité restante
-  const handleChange = (event, id) => {
+  const handleChange = (event, row) => {
     event.preventDefault();
-    setSelectId(id);
-    console.log("idRow", id);
-
-    /*getReservationById(id)
-      .then((response) => {
-        console.log("Document ", response.data());
-        let qttReserve = response.data().quantiteReserve;
-        console.log("qttReserve", qttReserve);
-        let statutReserve = response.data().statutReservation;
-        console.log("statutReserve", statutReserve);
-      })
-      .catch((error) => {
-        console.error("Error : ", error);
-      });*/
+    let _quantiteDispo =
+      parseInt(row.quantiteArticle) - parseInt(row.quantiteReserve);
+    if (_quantiteDispo < 0) {
+      console.log("quantité negative");
+      return;
+    }
+    console.log(row);
+    const reservation = {
+      statutReservation: "Validée",
+      reserverId: row.idReservation,
+    };
+    updateReservation(reservation).then(() => {
+      const article = {
+        id: row.idArticle,
+        quantite: _quantiteDispo,
+        statut: _quantiteDispo == 0 ? "Retiré" : "Diponible",
+      };
+      updateArticle(article).then(() => {
+        /* const updateReservation = {
+          idArticle: row.idArticle,
+          emailClient: row.emailClient,
+          titreArticle: row.titreArticle,
+          quantiteArticle: _quantiteDispo,
+          quantiteReserve: row.quantiteReserve,
+          titrePointVente: row.titrePointVente,
+          statutReservation: "Retirée",
+          dateReservation: row.dateReservation,
+          idReservation: row.idReservation,
+        };*/
+        const updateReservation2 = {
+          ...row,
+          statutReservation: "Retirée",
+          quantiteArticle: _quantiteDispo,
+        };
+        //setRows([...rows, updateReservation]);
+        let updatedRows = rows.map((item) =>
+          item.idReservation == row.idReservation ? updateReservation2 : item
+        );
+        setRows(updatedRows);
+      });
+    });
   };
 
   useEffect(() => {
     console.log("use effect here ");
     // get list reservations
-    getReservation()
-      .then((response) => {
-        let _reservations = response.docs.map((doc) => doc.data());
-        console.log("reservations", _reservations);
-        //get list id client from reservation
-        let ListIdClients = _reservations.map((res) => res.idClient);
-        console.log("ListIdClients", ListIdClients);
-        // get liste client from reservation
-        getListClientByListId([...new Set(ListIdClients)]).then((snapshot) => {
-          let listClients = snapshot.docs.map((doc) => doc.data());
-          console.log("listClients", listClients);
-
-          let ListIdArticles = _reservations.map((res) => res.idArticle);
-          console.log("ListIdArticles", ListIdArticles);
-          // get list article
-          getListArticlesByListId([...new Set(ListIdArticles)]).then(
+    if (rows.length == 0) {
+      getReservation()
+        .then((response) => {
+          let _reservations = response.docs.map((doc) => doc.data());
+          console.log("reservations", _reservations);
+          //get list id client from reservation
+          let ListIdClients = _reservations.map((res) => res.idClient);
+          console.log("ListIdClients", ListIdClients);
+          // get liste client from reservation
+          getListClientByListId([...new Set(ListIdClients)]).then(
             (snapshot) => {
-              let listArticles = snapshot.docs.map((doc) => doc.data());
-              console.log("listArticles", listArticles);
+              let listClients = snapshot.docs.map((doc) => doc.data());
+              console.log("listClients", listClients);
 
-              let ListIdPtv = _reservations.map((res) => res.idPointVente);
-              console.log("ListIdPtv", ListIdPtv);
-
-              // get list pointvente
-              getListPointVenteByListId([...new Set(ListIdPtv)]).then(
+              let ListIdArticles = _reservations.map((res) => res.idArticle);
+              console.log("ListIdArticles", ListIdArticles);
+              // get list article
+              getListArticlesByListId([...new Set(ListIdArticles)]).then(
                 (snapshot) => {
-                  let listPtv = snapshot.docs.map((doc) => doc.data());
-                  console.log("listPtv", listPtv);
+                  let listArticles = snapshot.docs.map((doc) => doc.data());
+                  console.log("listArticles", listArticles);
 
-                  //get listqttReserve
+                  let ListIdPtv = _reservations.map((res) => res.idPointVente);
+                  console.log("ListIdPtv", ListIdPtv);
 
-                  //construire array de reservation
-                  let _rows = [];
-                  for (let index = 0; index < _reservations.length; index++) {
-                    const element = _reservations[index];
-                    const item = {
-                      emailClient: listClients.find(
-                        (client) => client.id === element.idClient
-                      ).email,
-                      titreArticle: listArticles.find(
-                        (article) => article.id === element.idArticle
-                      ).titreArticle,
-                      quantiteArticle: listArticles.find(
-                        (quantite) => quantite.id === element.idArticle
-                      ).quantite,
-                      quantiteReserve: element.quantiteReserve,
-                      titrePointVente: listArticles.find(
-                        (ptv) => ptv.id === element.idArticle
-                      ).nomPointVente,
-                      statutReservation: element.statutReservation,
-                      dateReservation: element.dateReservation,
-                      idReservation: element.reserverId,
-                    };
-                    _rows.push(item);
-                    console.log(item);
-                  }
-                  setRows(_rows);
-                  console.log("_rows", _rows);
+                  // get list pointvente
+                  getListPointVenteByListId([...new Set(ListIdPtv)]).then(
+                    (snapshot) => {
+                      let listPtv = snapshot.docs.map((doc) => doc.data());
+                      console.log("listPtv", listPtv);
+
+                      //get listqttReserve
+
+                      //construire array de reservation
+                      let _rows = [];
+                      for (
+                        let index = 0;
+                        index < _reservations.length;
+                        index++
+                      ) {
+                        const element = _reservations[index];
+                        const item = {
+                          idArticle: element.idArticle,
+                          emailClient: listClients.find(
+                            (client) => client.id === element.idClient
+                          ).email,
+                          titreArticle: listArticles.find(
+                            (article) => article.id === element.idArticle
+                          ).titreArticle,
+                          quantiteArticle: listArticles.find(
+                            (quantite) => quantite.id === element.idArticle
+                          ).quantite,
+                          quantiteReserve: element.quantiteReserve,
+                          titrePointVente: listArticles.find(
+                            (ptv) => ptv.id === element.idArticle
+                          ).nomPointVente,
+                          statutReservation: element.statutReservation,
+                          dateReservation: element.dateReservation,
+                          idReservation: element.reserverId,
+                        };
+                        _rows.push(item);
+                        console.log(item);
+                      }
+                      setRows(_rows);
+                      console.log("_rows", _rows);
+                    }
+                  );
                 }
               );
             }
           );
+        })
+        .catch((error) => {
+          console.error("Error : ", error);
         });
-      })
-      .catch((error) => {
-        console.error("Error : ", error);
-      });
-  }, []);
+    }
+  }, [rows.length]);
 
   return (
     <Grid container spacing={2}>
@@ -163,7 +198,7 @@ const Statistique = () => {
       </Grid>
       <Grid item xs={12} sm={6}>
         <Paper elevation={3}>
-          <Chart data={_data}>
+          <Chart data={diagrammeBatons}>
             <ArgumentAxis />
             <ValueAxis />
             <BarSeries valueField="value" argumentField="argument" />
@@ -227,8 +262,11 @@ const Statistique = () => {
                     <Button
                       variant="contained"
                       onClick={(event) => {
-                        handleChange(event, row.idReservation);
+                        handleChange(event, row);
                       }}
+                      disabled={
+                        parseInt(row.quantiteArticle) > 0 ? false : true
+                      }
                     >
                       Retirer
                     </Button>

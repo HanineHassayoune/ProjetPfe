@@ -14,13 +14,7 @@ import { CompteModel } from "../Models/CompteModel";
 import { getConnectedUser } from "../Helpers/FireBase";
 
 export default function ModifierCompte() {
-  const [data, setData] = useState({
-    nom: "",
-    prenom: "",
-    type: "",
-    email: "",
-    password: "",
-  });
+  const regNum = new RegExp("^[0-9\b]+$");
   const [loading, setLoading] = useState(true);
   const theme = createTheme();
   const [errors, setErrors] = useState({
@@ -28,43 +22,50 @@ export default function ModifierCompte() {
     prenom: "",
     type: "",
     email: "",
+    numerotlf: "",
     password: "",
   });
+
   const [user, setUser] = useState({
     nom: "",
     prenom: "",
     type: "",
     email: "",
+    numerotlf: "",
   });
 
   //validation formulaire
-  const regNom = new RegExp("^[a-zA-Z]+[a-zA-Z]+$");
-  const pattern = new RegExp("^[a-zA-Z0-9]+@[a-zA-Z0-9]+.[A-Za-z]+$");
-  const isFormValid = (data) => {
+  const regNom = new RegExp("^[a-zA-Z]+ [a-zA-Z]+|[a-zA-Z]+$");
+
+  const isFormValid = (user) => {
     const _errors = { ...errors };
-    if (!data.nom) {
+    //verifier nom
+    if (!user.nom) {
       _errors.nom = "Le nom est obligatoire";
-    } else if (!regNom.test(data.nom)) {
+    } else if (!regNom.test(user.nom)) {
       _errors.nom = "Le nom doit contenir seulement des lettres";
     } else _errors.nom = "";
-
-    if (!data.prenom) {
+    //verifier prenom
+    if (!user.prenom) {
       _errors.prenom = "Le prenom est obligatoire";
-    } else if (!regNom.test(data.prenom)) {
+    } else if (!regNom.test(user.prenom)) {
       _errors.prenom = "Le prenom doit contenir seulement des lettres";
     } else _errors.prenom = "";
 
-    if (!data.email) {
-      _errors.email = "L'email est obligatoire";
-    } else if (!pattern.test(data.email)) {
-      _errors.email = "Vérifier votre email";
-    } else _errors.email = "";
-
-    if (!data.password) {
+    //verifier numero tlf
+    if (!user.numerotlf) {
+      _errors.numerotlf = "Le numero téléphone est obligatoire";
+    } else if (!regNum.test(user.numerotlf)) {
+      _errors.numerotlf =
+        "Le numero téléphone doit contenir seulement des chiffres";
+    } else if (user.numerotlf.length != 8) {
+      _errors.numerotlf = "Le numero téléphone doit contenir 8 chiffres";
+    } else _errors.numerotlf = "";
+    /* if (!user.password) {
       _errors.password = "Le mots de passe est obligatoire";
-    } else if (data.password.length < 6) {
+    } else if (user.password.length < 6) {
       _errors.password = "Mots de passe doit etre superieure 6";
-    } else _errors.password = "";
+    } else _errors.password = "";*/
     setErrors(_errors);
     if (Object.values(_errors).filter((item) => item).length === 0) {
       return true;
@@ -73,10 +74,12 @@ export default function ModifierCompte() {
 
   useEffect(() => {
     console.log("use effect here");
+    //get connected user
     getConnectedUser().then((_user) => {
       console.log("_user", _user);
       const jsonUser = _user;
       console.log("jsonUser", jsonUser);
+      //get user by id
       getUserById(jsonUser.uid)
         .then((snapshot) => {
           let values = snapshot.data();
@@ -86,7 +89,8 @@ export default function ModifierCompte() {
             values.nom,
             values.prenom,
             values.type,
-            values.email
+            values.email,
+            values.numerotlf
           );
           setUser(compte);
           console.log("compteUser", compte);
@@ -96,20 +100,18 @@ export default function ModifierCompte() {
         });
     });
   }, []);
-
+  // handleChange values of user
   const handleChange = (event) => {
     setUser({ ...user, [event.target.name]: event.target.value });
   };
+  //handle submit form after validation
   const handleSubmit = (event) => {
     event.preventDefault();
-    updateCompte(user);
-    alert("votre compte est modifié avec succès");
-
-    console.log("user after update", user);
-
-    /* if (isFormValid(data)) {
-      console.log("form valid");
-    } else console.log("form non valid");*/
+    if (isFormValid(user)) {
+      updateCompte(user);
+      alert("votre compte est modifié avec succès");
+      console.log("user after update", user);
+    }
   };
 
   return (
@@ -178,6 +180,19 @@ export default function ModifierCompte() {
                     value={user.prenom}
                     onChange={(e) => handleChange(e)}
                   />
+                  <TextField
+                    margin="normal"
+                    required
+                    fullWidth
+                    name="numerotlf"
+                    label="Numero téléphone"
+                    type="numerotlf"
+                    id="numerotlf"
+                    error={errors.numerotlf ? true : false}
+                    helperText={errors.numerotlf}
+                    value={user.numerotlf}
+                    onChange={(e) => handleChange(e)}
+                  />
 
                   <TextField
                     margin="normal"
@@ -187,28 +202,10 @@ export default function ModifierCompte() {
                     label="Email"
                     type="email"
                     id="email"
-                    // autoComplete="email"
                     disabled
-                    error={errors.email ? true : false}
-                    helperText={errors.email}
                     value={user.email}
-                    onChange={(e) => handleChange(e)}
                   />
 
-                  {/*  <TextField
-                    margin="normal"
-                    required
-                    fullWidth
-                    name="password"
-                    label="Mots de passe"
-                    type="password"
-                    id="password"
-                    autoComplete="password"
-                    error={errors.password ? true : false}
-                    helperText={errors.password}
-                    onChange={(e) => handleChange(e)}
-                  />
-              */}
                   <Button
                     type="submit"
                     fullWidth

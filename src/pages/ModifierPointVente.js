@@ -29,9 +29,10 @@ export default function ModifierPointVente() {
   const [image, setImage] = useState(null);
   const [url, setUrl] = useState("");
   const [progress, setProgress] = useState(0);
-  const pattern = new RegExp("^[a-zA-Z0-9]+@[a-zA-Z0-9]+[.][A-Za-z]+$");
-  const regNom = new RegExp("^[a-zA-Z]+[a-zA-Z]+$");
-  const regNum = new RegExp("^[0-9\b]+$");
+
+  const regNom = new RegExp("^[a-zA-Z]+ [a-zA-Z]+|[a-zA-Z]+$");
+  const regNum = new RegExp("^[0-9]+.[0-9]+|[0-9\b]+$");
+
   const navigate = useNavigate();
   const [data, setData] = useState({
     titrePointVente: "",
@@ -53,6 +54,7 @@ export default function ModifierPointVente() {
 
   useEffect(() => {
     console.log("use effect here ");
+    //get point de vente by id
     getPointsVenteById(id)
       .then((result) => {
         console.log(result.data());
@@ -63,6 +65,8 @@ export default function ModifierPointVente() {
           values.idArticles,
           values.titrePointVente,
           values.adressePointVente,
+          values.latitude,
+          values.longitude,
           values.email,
           values.numerotlf,
           values.urlImagePtv
@@ -116,37 +120,31 @@ export default function ModifierPointVente() {
   };
 
   //validation formulaire
-
   const isFormValid = (data) => {
     const _errors = { ...errors };
-
+    //verifier titre point de vente
     if (!data.titrePointVente) {
       _errors.titrePointVente = "Titre est obligatoire";
     } else if (!regNom.test(data.titrePointVente)) {
       _errors.titrePointVente = "Le titre doit contenir seulement des lettres";
     } else _errors.titrePointVente = "";
-
-    if (!data.email) {
-      _errors.email = "Email est obligatoire";
-    } else if (!pattern.test(data.email)) {
-      _errors.email = "Vérifier votre email";
-    } else _errors.email = "";
-
+    //verifier adresse point de vente
     if (!data.adressePointVente) {
       _errors.adressePointVente = "Adresse est obligatoire";
-    } else if (!regNom.test(data.adressePointVente)) {
-      _errors.adressePointVente =
-        "Le titre doit contenir seulement des lettres";
     } else _errors.adressePointVente = "";
-
-    if (!data.numerotlf) {
-      _errors.numerotlf = "Numero téléphone est obligatoire";
-    } else if (!regNum.test(data.numerotlf)) {
-      _errors.numerotlf = "Le numéro doit contenir seulement des chiffres";
-    } else if (!data.numerotlf.length === 8) {
-      _errors.numerotlf = "Le numéro doit contenir 8 chiffres";
-    } else _errors.numerotlf = "";
-
+    //verifier latitude point de vente
+    if (!data.latitude) {
+      _errors.latitude = "Latitude est obligatoire";
+    } else if (!regNum.test(data.latitude)) {
+      _errors.latitude = "Latitude doit contenir seulement des chiffres";
+    } else _errors.latitude = "";
+    //verifier longitude point de vente
+    if (!data.longitude) {
+      _errors.longitude = "Longitude est obligatoire";
+    } else if (!regNum.test(data.longitude)) {
+      _errors.longitude = "Longitude doit contenir seulement des chiffres";
+    } else _errors.longitude = "";
+    //set error
     setErrors(_errors);
     if (Object.values(_errors).filter((item) => item).length === 0) {
       return true;
@@ -249,6 +247,36 @@ export default function ModifierPointVente() {
                       value={data.adressePointVente}
                     />
                   </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      margin="normal"
+                      required
+                      fullWidth
+                      id="latitude"
+                      label="Latitude"
+                      name="latitude"
+                      error={errors.latitude ? true : false}
+                      helperText={errors.latitude}
+                      onChange={(e) => handleChange(e)}
+                      value={data.latitude}
+                      autoComplete="latitude"
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      margin="normal"
+                      required
+                      fullWidth
+                      id="longitude"
+                      label="Longitude "
+                      name="longitude"
+                      error={errors.longitude ? true : false}
+                      helperText={errors.longitude}
+                      onChange={(e) => handleChange(e)}
+                      value={data.longitude}
+                      autoComplete="longitude"
+                    />
+                  </Grid>
 
                   <Grid item xs={12}>
                     <TextField
@@ -261,9 +289,9 @@ export default function ModifierPointVente() {
                       id="email"
                       // autoComplete="email"
                       disabled
-                      error={errors.email ? true : false}
-                      helperText={errors.email}
-                      onChange={(e) => handleChange(e)}
+                      // error={errors.email ? true : false}
+                      // helperText={errors.email}
+                      // onChange={(e) => handleChange(e)}
                       value={data.email}
                     />
                   </Grid>
@@ -276,10 +304,11 @@ export default function ModifierPointVente() {
                       label="Numéro téléphone"
                       type="numerotlf"
                       id="numerotlf"
-                      autoComplete="numerotlf"
-                      error={errors.numerotlf ? true : false}
-                      helperText={errors.numerotlf}
-                      onChange={(e) => handleChange(e)}
+                      // autoComplete="numerotlf"
+                      disabled
+                      //error={errors.numerotlf ? true : false}
+                      // helperText={errors.numerotlf}
+                      //onChange={(e) => handleChange(e)}
                       value={data.numerotlf}
                     />
                   </Grid>
