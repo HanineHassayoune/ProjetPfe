@@ -90,7 +90,7 @@ export default function ConsulterPointsVente() {
                 Titre point vente
               </TableCell>
               <TableCell align="center" bgcolor="#e3f2fd">
-                Aresse point vente
+                Adresse point vente
               </TableCell>
               <TableCell align="center" bgcolor="#e3f2fd">
                 Email point vente

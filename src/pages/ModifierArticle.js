@@ -30,16 +30,12 @@ const status = [
     label: "Disponible",
   },
   {
-    value: "Reservé",
-    label: "Reservé",
-  },
-  {
-    value: "Retiré",
-    label: "Retiré",
-  },
-  {
     value: "Perimé",
     label: "Perimé",
+  },
+  {
+    value: "Nouveau",
+    label: "Nouveau",
   },
 ];
 const Unite = [
@@ -64,12 +60,8 @@ const Unite = [
     label: "cl",
   },
   {
-    value: "boite",
-    label: "boite",
-  },
-  {
-    value: "Autre",
-    label: "Autre",
+    value: "élément(s)",
+    label: "élément(s)",
   },
 ];
 const TypesArticle = [
@@ -235,14 +227,14 @@ export default function ModifierArticle() {
   const isFormValid = (data) => {
     const _errors = { ...errors };
     //verifier titre article
-    if (!data.titreArticle) {
+    /* if (!data.titreArticle) {
       _errors.titreArticle = "Titre  est obligatoire";
     } else if (!regNom.test(data.titreArticle)) {
       _errors.titreArticle = "Titre contient uniquement des lettres ";
     } else _errors.titreArticle = "";
     if (!data.typeArticle) {
       _errors.typeArticle = "Type article est obligatoire";
-    } else _errors.typeArticle = "";
+    } else _errors.typeArticle = "";*/
 
     //verifier prix initial d'article
     if (!data.prixInitial) {
@@ -398,16 +390,12 @@ export default function ModifierArticle() {
                     <Grid item xs={12} sm={6}>
                       <TextField
                         margin="normal"
-                        required
                         fullWidth
                         id="nomPointVente"
                         label="Nom point de vente"
                         name="nomPointVente"
                         autoComplete="nomPointVente"
-                        //error={errors.nomPointVente ? true : false}
-                        //helperText={errors.nomPointVente}
                         disabled
-                        //onChange={(e) => handleChange(e)}
                         value={data.nomPointVente}
                       />
                     </Grid>
@@ -415,16 +403,11 @@ export default function ModifierArticle() {
                     <Grid item xs={12} sm={6}>
                       <TextField
                         margin="normal"
-                        required
                         fullWidth
                         id="nomCommercant"
                         label="Nom commerçant"
                         name="nomCommercant"
-                        //autoComplete="nomCommercant"
                         disabled
-                        error={errors.nomCommercant ? true : false}
-                        //helperText={errors.nomCommercant}
-                        //onChange={(e) => handleChange(e)}
                         value={data.nomCommercant}
                       />
                     </Grid>

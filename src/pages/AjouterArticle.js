@@ -67,12 +67,8 @@ const Unite = [
     label: "cl",
   },
   {
-    value: "boite",
-    label: "boite",
-  },
-  {
-    value: "Autre",
-    label: "Autre",
+    value: "élément(s)",
+    label: "élément(s)",
   },
 ];
 
@@ -180,6 +176,7 @@ export default function Ajouter() {
               value: elem.id,
               label: elem.titrePointVente,
             }));
+            _listPTV.unshift({ value: "", label: "----" });
             console.log("_listPTV", _listPTV);
             setListPTV(_listPTV);
 
@@ -297,10 +294,7 @@ export default function Ajouter() {
     if (!data.dateretrait) {
       _errors.dateretrait = "Date de retrait est obligatoire";
     } else _errors.dateretrait = "";
-    //verifier statut d'article
-    if (!data.statut) {
-      _errors.statut = "Selectionner le statut ";
-    } else _errors.statut = "";
+
     //verifier description
     if (!data.description) {
       _errors.description = "Description est obligatoire";
@@ -329,7 +323,7 @@ export default function Ajouter() {
       titreArticle: data.get("titreArticle"),
       typeArticle: data.get("typeArticle"),
       urlImage: url,
-      nomPointVente: ptv.nomPointVente,
+      nomPointVente: ptv.idPointVente ? ptv.nomPointVente : "",
       idPointVente: ptv.idPointVente,
       nomCommercant: user.prenom,
       prixInitial: data.get("prixInitial"),
@@ -338,7 +332,8 @@ export default function Ajouter() {
       quantite: data.get("quantite"),
       datevalidite: date,
       dateretrait: _date,
-      statut: data.get("statut"),
+      statut: ptv.idPointVente ? "Disponible" : "Nouveau",
+      // statut: data.get("statut"),
       description: data.get("description"),
     };
     console.log("dataValues avant firebase", dataValues);
@@ -594,7 +589,7 @@ export default function Ajouter() {
                         />
                       </LocalizationProvider>
                     </Grid>
-                    <Grid item xs={12}>
+                    {/*  <Grid item xs={12}>
                       <TextField
                         margin="normal"
                         required
@@ -616,7 +611,7 @@ export default function Ajouter() {
                           </MenuItem>
                         ))}
                       </TextField>
-                    </Grid>
+                        </Grid>*/}
                     <Grid item xs={12}>
                       <TextField
                         margin="normal"

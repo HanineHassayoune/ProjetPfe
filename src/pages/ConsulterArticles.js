@@ -215,7 +215,9 @@ export default function ConsulterArticles() {
                       <TableCell align="center">{row.id}</TableCell>
                       <TableCell align="center">{row.titreArticle}</TableCell>
                       <TableCell align="center">{row.typeArticle}</TableCell>
-                      <TableCell align="center">{row.nomPointVente}</TableCell>
+                      <TableCell align="center" bgcolor="#e3f2fd">
+                        {row.nomPointVente}
+                      </TableCell>
                       <TableCell align="center">{row.nomCommercant}</TableCell>
                       <TableCell align="center">{row.prixInitial}</TableCell>
                       <TableCell align="center">{row.prixActuel}</TableCell>

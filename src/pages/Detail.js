@@ -14,7 +14,7 @@ import { useEffect, useState } from "react";
 import { getPointsVenteById } from "../controleurs/PointDeVenteControleur";
 import { useParams } from "react-router-dom";
 import { PointDeVenteModel } from "../Models/PointDeVenteModel";
-import { consulterListeArticlesCurrentUser } from "../controleurs/ArticleControleurs";
+import { consulterListeArticlesCurrentUserWithoutPtv } from "../controleurs/ArticleControleurs";
 import {
   setIdArticlesToPointVente,
   deleteIdArticlesToPointVente,
@@ -24,6 +24,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { Box } from "@mui/material";
 import { getConnectedUser } from "../Helpers/FireBase";
 import { updateArticle } from "../controleurs/ArticleControleurs";
+import { getReservationCurrentUser } from "../controleurs/ReservationControleur";
 function not(a, b) {
   return a.filter((value) => b.indexOf(value) === -1);
 }
@@ -43,6 +44,7 @@ export default function TransferList() {
   const [checked, setChecked] = useState([]);
   const [left, setLeft] = useState([]);
   const [right, setRight] = useState([]);
+  const [reservations, setReservations] = useState();
 
   const leftChecked = intersection(checked, left);
   const rightChecked = intersection(checked, right);
@@ -81,25 +83,46 @@ export default function TransferList() {
           setDetail(pointVente);
 
           //LeftList-->get articles from firebase for this Ptv
-          getListArticlesFromPtvByListId(pointVente.idArticles).then(
-            (_list) => {
-              let LeftList = _list;
-              setRight(LeftList);
-              console.log("Right here ", LeftList);
+          getReservationCurrentUser(_user.uid).then((result) => {
+            let _reservations = result.docs.map((doc) => doc.data());
+            console.log("reservation", _reservations);
+            let listArticleAvecReservation = _reservations.map(
+              (list) => list.idArticle
+            );
+            console.log(
+              "listArticleAvecReservation",
+              listArticleAvecReservation
+            );
+            let listArticlesWithoutReservation = pointVente.idArticles.filter(
+              (id) => listArticleAvecReservation.includes(id) == false
+            );
+            console.log(
+              "listArticlesWithoutReservation",
+              listArticlesWithoutReservation
+            );
 
-              //rigthList-->get articles from firebase
-              consulterListeArticlesCurrentUser(_user.uid).then((snapshot) => {
-                let rigthList = snapshot.docs.map((doc) => doc.data());
-                setArticle(rigthList);
-                console.log("Left Here", rigthList);
-                const r = rigthList.filter(
-                  (elem) => !LeftList.find(({ id }) => elem.id == id)
+            getListArticlesFromPtvByListId(listArticlesWithoutReservation).then(
+              (_list) => {
+                let LeftList = _list;
+                setRight(LeftList);
+                console.log("Right here ", LeftList);
+
+                //rigthList-->get articles from firebase
+                consulterListeArticlesCurrentUserWithoutPtv(_user.uid).then(
+                  (snapshot) => {
+                    let rigthList = snapshot.docs.map((doc) => doc.data());
+                    setArticle(rigthList);
+                    console.log("Left Here", rigthList);
+                    const r = rigthList.filter(
+                      (elem) => !LeftList.find(({ id }) => elem.id == id)
+                    );
+                    console.log("result left filter ", r);
+                    setLeft(r);
+                  }
                 );
-                console.log("result left filter ", r);
-                setLeft(r);
-              });
-            }
-          );
+              }
+            );
+          });
         });
       })
 
@@ -166,6 +189,17 @@ export default function TransferList() {
     let listId = left.concat(rightChecked).map((item) => item.id);
     setLeft(left.concat(rightChecked));
     setRight(not(right, rightChecked));
+    rightChecked.forEach((element) => {
+      console.log("element", element);
+      element.nomPointVente = "";
+      element.idPointVente = "";
+      element.statut = "Nouveau";
+      console.log("element after update right", element);
+      console.log("detail", detail);
+      updateArticle(element).then((result) => {
+        console.log(result);
+      });
+    });
     setChecked(not(checked, rightChecked));
     deleteIdArticlesToPointVente(id, listId);
     console.log(listId);

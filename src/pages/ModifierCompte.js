@@ -196,7 +196,6 @@ export default function ModifierCompte() {
 
                   <TextField
                     margin="normal"
-                    required
                     fullWidth
                     name="email"
                     label="Email"

@@ -153,6 +153,7 @@ export default function AjouterPointVente() {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const dataValues = {
+      idCommercant: user.id,
       titrePointVente: data.get("titrePointVente"),
       email: user.email,
       adressePointVente: data.get("adressePointVente"),

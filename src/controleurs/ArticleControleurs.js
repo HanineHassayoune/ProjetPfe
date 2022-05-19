@@ -34,6 +34,13 @@ export function consulterListeArticlesCurrentUser(currentUser) {
     .where("idCommercant", "==", currentUser);
   return docRef.get();
 }
+export function consulterListeArticlesCurrentUserWithoutPtv(currentUser) {
+  var docRef = db
+    .collection("Articles")
+    .where("idCommercant", "==", currentUser)
+    .where("idPointVente", "==", "");
+  return docRef.get();
+}
 export function deleteArticle(id) {
   var docRef = db.collection("Articles");
   return docRef.doc(id).delete();
