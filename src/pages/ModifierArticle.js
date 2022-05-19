@@ -517,12 +517,17 @@ export default function ModifierArticle() {
                         onChange={(e) => handleChange(e)}
                         value={data.datevalidite}
                         />*/}
+
                       <LocalizationProvider dateAdapter={AdapterDateFns}>
                         <DatePicker
                           label="Date de validité"
                           value={data.datevalidite}
                           onChange={(newDateV) => {
-                            setDateV(newDateV);
+                            var date = newDateV
+                              ? moment(newDateV).format("L")
+                              : "";
+                            console.log(date);
+                            setData({ ...data, datevalidite: date });
                           }}
                           renderInput={(params) => <TextField {...params} />}
                         />
@@ -549,7 +554,11 @@ export default function ModifierArticle() {
                           label="Date du retrait"
                           value={data.dateretrait}
                           onChange={(newDateR) => {
-                            setDateR(newDateR);
+                            var date = newDateR
+                              ? moment(newDateR).format("L")
+                              : "";
+                            console.log(date);
+                            setData({ ...data, dateretrait: date });
                           }}
                           renderInput={(params) => <TextField {...params} />}
                         />

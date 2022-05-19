@@ -16,9 +16,10 @@ import Button from "@mui/material/Button";
 import CancelIcon from "@mui/icons-material/Cancel";
 import ReportProblemIcon from "@mui/icons-material/ReportProblem";
 import { useState, useEffect } from "react";
-import { consulterListePointsVente } from "../controleurs/PointDeVenteControleur";
+import { consulterListePointsVenteCurrentUser } from "../controleurs/PointDeVenteControleur";
 import { deletePointVente } from "../controleurs/PointDeVenteControleur";
 import FindInPageIcon from "@mui/icons-material/FindInPage";
+import { getConnectedUser } from "../Helpers/FireBase";
 
 export default function ConsulterPointsVente() {
   const style = {
@@ -38,11 +39,13 @@ export default function ConsulterPointsVente() {
   const [rows, setRows] = useState([]);
   useEffect(() => {
     console.log("use effect here");
-    consulterListePointsVente().then((snapshot) => {
-      console.log(snapshot);
-      let values = snapshot.docs.map((doc) => doc.data());
-      console.log(values);
-      setRows(values);
+    getConnectedUser().then((_user) => {
+      consulterListePointsVenteCurrentUser(_user.uid).then((snapshot) => {
+        console.log(snapshot);
+        let values = snapshot.docs.map((doc) => doc.data());
+        console.log(values);
+        setRows(values);
+      });
     });
     console.log("message");
   }, []);

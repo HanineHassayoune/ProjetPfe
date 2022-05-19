@@ -28,11 +28,12 @@ export function ajouterArticle(data) {
 }
 //recuperer article by commercant id("123") ---->id commercant ->
 
-export function consulterListeArticles() {
-  var docRef = db.collection("Articles");
+export function consulterListeArticlesCurrentUser(currentUser) {
+  var docRef = db
+    .collection("Articles")
+    .where("idCommercant", "==", currentUser);
   return docRef.get();
 }
-
 export function deleteArticle(id) {
   var docRef = db.collection("Articles");
   return docRef.doc(id).delete();

@@ -63,6 +63,7 @@ export default function ModifierPointVente() {
         const pointVente = new PointDeVenteModel(
           values.id,
           values.idArticles,
+          values.idCommercant,
           values.titrePointVente,
           values.adressePointVente,
           values.latitude,

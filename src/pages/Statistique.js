@@ -19,7 +19,7 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import { useState, useEffect } from "react";
-import { getReservation } from "../controleurs/ReservationControleur";
+import { getReservationCurrentUser } from "../controleurs/ReservationControleur";
 import { getListClientByListId } from "../controleurs/CompteControleur";
 import {
   getListArticlesByListId,
@@ -32,6 +32,7 @@ import Typography from "@mui/material/Typography";
 
 import { updateReservation } from "../controleurs/ReservationControleur";
 import { Button } from "@mui/material";
+import { getConnectedUser } from "../Helpers/FireBase";
 
 const Statistique = () => {
   const [rows, setRows] = useState([]);
@@ -107,83 +108,87 @@ const Statistique = () => {
 
   useEffect(() => {
     console.log("use effect here ");
-    // get list reservations
-    if (rows.length == 0) {
-      getReservation()
-        .then((response) => {
-          let _reservations = response.docs.map((doc) => doc.data());
-          console.log("reservations", _reservations);
-          //get list id client from reservation
-          let ListIdClients = _reservations.map((res) => res.idClient);
-          console.log("ListIdClients", ListIdClients);
-          // get liste client from reservation
-          getListClientByListId([...new Set(ListIdClients)]).then(
-            (snapshot) => {
-              let listClients = snapshot.docs.map((doc) => doc.data());
-              console.log("listClients", listClients);
+    getConnectedUser().then((_user) => {
+      // get list reservations
+      if (rows.length == 0) {
+        getReservationCurrentUser(_user.uid)
+          .then((response) => {
+            let _reservations = response.docs.map((doc) => doc.data());
+            console.log("reservations", _reservations);
+            //get list id client from reservation
+            let ListIdClients = _reservations.map((res) => res.idClient);
+            console.log("ListIdClients", ListIdClients);
+            // get liste client from reservation
+            getListClientByListId([...new Set(ListIdClients)]).then(
+              (snapshot) => {
+                let listClients = snapshot.docs.map((doc) => doc.data());
+                console.log("listClients", listClients);
 
-              let ListIdArticles = _reservations.map((res) => res.idArticle);
-              console.log("ListIdArticles", ListIdArticles);
-              // get list article
-              getListArticlesByListId([...new Set(ListIdArticles)]).then(
-                (snapshot) => {
-                  let listArticles = snapshot.docs.map((doc) => doc.data());
-                  console.log("listArticles", listArticles);
+                let ListIdArticles = _reservations.map((res) => res.idArticle);
+                console.log("ListIdArticles", ListIdArticles);
+                // get list article
+                getListArticlesByListId([...new Set(ListIdArticles)]).then(
+                  (snapshot) => {
+                    let listArticles = snapshot.docs.map((doc) => doc.data());
+                    console.log("listArticles", listArticles);
 
-                  let ListIdPtv = _reservations.map((res) => res.idPointVente);
-                  console.log("ListIdPtv", ListIdPtv);
+                    let ListIdPtv = _reservations.map(
+                      (res) => res.idPointVente
+                    );
+                    console.log("ListIdPtv", ListIdPtv);
 
-                  // get list pointvente
-                  getListPointVenteByListId([...new Set(ListIdPtv)]).then(
-                    (snapshot) => {
-                      let listPtv = snapshot.docs.map((doc) => doc.data());
-                      console.log("listPtv", listPtv);
+                    // get list pointvente
+                    getListPointVenteByListId([...new Set(ListIdPtv)]).then(
+                      (snapshot) => {
+                        let listPtv = snapshot.docs.map((doc) => doc.data());
+                        console.log("listPtv", listPtv);
 
-                      //get listqttReserve
+                        //get listqttReserve
 
-                      //construire array de reservation
-                      let _rows = [];
-                      for (
-                        let index = 0;
-                        index < _reservations.length;
-                        index++
-                      ) {
-                        const element = _reservations[index];
-                        const item = {
-                          idArticle: element.idArticle,
-                          emailClient: listClients.find(
-                            (client) => client.id === element.idClient
-                          ).email,
-                          titreArticle: listArticles.find(
-                            (article) => article.id === element.idArticle
-                          ).titreArticle,
-                          quantiteArticle: listArticles.find(
-                            (quantite) => quantite.id === element.idArticle
-                          ).quantite,
-                          quantiteReserve: element.quantiteReserve,
-                          titrePointVente: listArticles.find(
-                            (ptv) => ptv.id === element.idArticle
-                          ).nomPointVente,
-                          statutReservation: element.statutReservation,
-                          dateReservation: element.dateReservation,
-                          idReservation: element.reserverId,
-                        };
-                        _rows.push(item);
-                        console.log(item);
+                        //construire array de reservation
+                        let _rows = [];
+                        for (
+                          let index = 0;
+                          index < _reservations.length;
+                          index++
+                        ) {
+                          const element = _reservations[index];
+                          const item = {
+                            idArticle: element.idArticle,
+                            emailClient: listClients.find(
+                              (client) => client.id === element.idClient
+                            ).email,
+                            titreArticle: listArticles.find(
+                              (article) => article.id === element.idArticle
+                            ).titreArticle,
+                            quantiteArticle: listArticles.find(
+                              (quantite) => quantite.id === element.idArticle
+                            ).quantite,
+                            quantiteReserve: element.quantiteReserve,
+                            titrePointVente: listArticles.find(
+                              (ptv) => ptv.id === element.idArticle
+                            ).nomPointVente,
+                            statutReservation: element.statutReservation,
+                            dateReservation: element.dateReservation,
+                            idReservation: element.reserverId,
+                          };
+                          _rows.push(item);
+                          console.log(item);
+                        }
+                        setRows(_rows);
+                        console.log("_rows", _rows);
                       }
-                      setRows(_rows);
-                      console.log("_rows", _rows);
-                    }
-                  );
-                }
-              );
-            }
-          );
-        })
-        .catch((error) => {
-          console.error("Error : ", error);
-        });
-    }
+                    );
+                  }
+                );
+              }
+            );
+          })
+          .catch((error) => {
+            console.error("Error : ", error);
+          });
+      }
+    });
   }, [rows.length]);
 
   return (

@@ -16,18 +16,20 @@ import { Box, makeStyles, Typography } from "@mui/material";
 import Button from "@mui/material/Button";
 import CancelIcon from "@mui/icons-material/Cancel";
 import ReportProblemIcon from "@mui/icons-material/ReportProblem";
-import { consulterListeArticles } from "../controleurs/ArticleControleurs";
+import { consulterListeArticlesCurrentUser } from "../controleurs/ArticleControleurs";
 import {
   deleteArticle,
   deleteArticleFromPointVente,
 } from "../controleurs/ArticleControleurs";
 import CircularProgress from "@mui/material/CircularProgress";
-import { consulterListePointsVente } from "../controleurs/PointDeVenteControleur";
+import { consulterListePointsVenteCurrentUser } from "../controleurs/PointDeVenteControleur";
 import {
-  getReservation,
+  getReservationCurrentUser,
   deleteReservation,
 } from "../controleurs/ReservationControleur";
-
+import { getConnectedUser } from "../Helpers/FireBase";
+import { CompteModel } from "../Models/CompteModel";
+import { getUserById } from "../controleurs/CompteControleur";
 //conposant react
 export default function ConsulterArticles() {
   const [loading, setLoading] = useState(true);
@@ -43,27 +45,46 @@ export default function ConsulterArticles() {
     boxShadow: 24,
     p: 4,
   };
-
+  const [selectId, setSelectId] = useState("");
+  const [user, setUser] = useState();
   const [rows, setRows] = useState([]);
   const [deletedArticle, setDeletedArticle] = useState();
   useEffect(() => {
     console.log("use effect here");
-    //consulter liste articles
-    consulterListeArticles().then((snapshot) => {
-      console.log(snapshot);
-      let values = snapshot.docs.map((doc) => doc.data());
-      setLoading(false);
-      console.log(values);
-      setRows(values);
+    getConnectedUser().then((_user) => {
+      console.log("_user", _user);
+      const jsonUser = _user;
+      console.log("jsonUser", jsonUser);
+      //get user by id
+      getUserById(jsonUser.uid).then((snapshot) => {
+        let values = snapshot.data();
+        setLoading(false);
+        const compte = new CompteModel(
+          values.id,
+          values.nom,
+          values.prenom,
+          values.type,
+          values.email
+        );
+        setUser(compte);
+        console.log("compteUser", compte);
+        consulterListeArticlesCurrentUser(_user.uid).then((snapshot) => {
+          console.log(snapshot);
+          let values = snapshot.docs.map((doc) => doc.data());
+          setLoading(false);
+          console.log(values);
+          setRows(values);
+        });
+      });
     });
     console.log("message");
   }, []);
+  console.log("compte", user);
 
-  const [selectId, setSelectId] = useState("");
   //supprimer article from all collection
   const supprimerArticle = () => {
     //consulter liste des point de vente
-    consulterListePointsVente().then((result) => {
+    consulterListePointsVenteCurrentUser(user.id).then((result) => {
       let listPointVente = result.docs.map((doc) => doc.data());
       console.log("listPointVente", listPointVente);
       const listIdArticles = listPointVente.map((list) => {
@@ -79,7 +100,7 @@ export default function ConsulterArticles() {
       });
     });
     //get reservation
-    getReservation().then((res) => {
+    getReservationCurrentUser(user.id).then((res) => {
       let listReservation = res.docs.map((doc) => doc.data());
       console.log("listReservation", listReservation);
       const result = listReservation.filter(
@@ -93,7 +114,7 @@ export default function ConsulterArticles() {
     deleteArticle(selectId)
       .then(() => {
         console.log("Document successfully deleted!");
-        //window.location.reload(true);
+        window.location.reload(true);
         deleteArticleFromPointVente().then((response) => {
           console.log(response);
           console.log("article successfully deleted from ptv!");

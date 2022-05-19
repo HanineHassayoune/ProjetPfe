@@ -10,6 +10,7 @@ export function ajouterPointVente(data) {
   let pointVenteToAdd = new PointDeVenteModel(
     PointVenteId,
     idArticles,
+    data.idCommercant,
     data.titrePointVente,
     data.adressePointVente,
     data.latitude,
@@ -22,8 +23,10 @@ export function ajouterPointVente(data) {
   return docRef.set(Object.assign({}, pointVenteToAdd));
 }
 
-export function consulterListePointsVente() {
-  var docRef = db.collection("PointsDeVente");
+export function consulterListePointsVenteCurrentUser(currentUser) {
+  var docRef = db
+    .collection("PointsDeVente")
+    .where("idCommercant", "==", currentUser);
   return docRef.get();
 }
 

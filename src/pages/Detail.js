@@ -14,7 +14,7 @@ import { useEffect, useState } from "react";
 import { getPointsVenteById } from "../controleurs/PointDeVenteControleur";
 import { useParams } from "react-router-dom";
 import { PointDeVenteModel } from "../Models/PointDeVenteModel";
-import { consulterListeArticles } from "../controleurs/ArticleControleurs";
+import { consulterListeArticlesCurrentUser } from "../controleurs/ArticleControleurs";
 import {
   setIdArticlesToPointVente,
   deleteIdArticlesToPointVente,
@@ -22,6 +22,8 @@ import {
 import { getListArticlesFromPtvByListId } from "../controleurs/ArticleControleurs";
 import CircularProgress from "@mui/material/CircularProgress";
 import { Box } from "@mui/material";
+import { getConnectedUser } from "../Helpers/FireBase";
+import { updateArticle } from "../controleurs/ArticleControleurs";
 function not(a, b) {
   return a.filter((value) => b.indexOf(value) === -1);
 }
@@ -36,6 +38,15 @@ function union(a, b) {
 
 export default function TransferList() {
   let { id } = useParams();
+  const [article, setArticle] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [checked, setChecked] = useState([]);
+  const [left, setLeft] = useState([]);
+  const [right, setRight] = useState([]);
+
+  const leftChecked = intersection(checked, left);
+  const rightChecked = intersection(checked, right);
+
   const [detail, setDetail] = useState({
     id: "",
     //idArticles: "",
@@ -45,61 +56,59 @@ export default function TransferList() {
     numerotlf: "",
     urlImagePtv: "",
   });
-  const [article, setArticle] = useState([]);
-  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    console.log("use effect here ");
-    getPointsVenteById(id)
-      .then((result) => {
-        console.log(result.data());
-        let values = result.data();
-        setLoading(false);
-        console.log("Values  ", values);
-        const pointVente = new PointDeVenteModel(
-          values.id,
-          values.idArticles,
-          values.titrePointVente,
-          values.adressePointVente,
-          values.latitude,
-          values.longitude,
-          values.email,
-          values.numerotlf,
-          values.urlImagePtv
-        );
-        setDetail(pointVente);
+    getConnectedUser()
+      .then((_user) => {
+        console.log("use effect here ");
+        getPointsVenteById(id).then((result) => {
+          console.log(result.data());
+          let values = result.data();
+          setLoading(false);
+          console.log("Values  ", values);
+          const pointVente = new PointDeVenteModel(
+            values.id,
+            values.idArticles,
+            values.idCommercant,
+            values.titrePointVente,
+            values.adressePointVente,
+            values.latitude,
+            values.longitude,
+            values.email,
+            values.numerotlf,
+            values.urlImagePtv
+          );
+          setDetail(pointVente);
 
-        //LeftList-->get articles from firebase for this Ptv
-        getListArticlesFromPtvByListId(pointVente.idArticles).then((_list) => {
-          let LeftList = _list;
-          setRight(LeftList);
-          console.log("Right here ", LeftList);
+          //LeftList-->get articles from firebase for this Ptv
+          getListArticlesFromPtvByListId(pointVente.idArticles).then(
+            (_list) => {
+              let LeftList = _list;
+              setRight(LeftList);
+              console.log("Right here ", LeftList);
 
-          //rigthList-->get articles from firebase
-          consulterListeArticles().then((snapshot) => {
-            let rigthList = snapshot.docs.map((doc) => doc.data());
-            setArticle(rigthList);
-            console.log("Left Here", rigthList);
-            const r = rigthList.filter(
-              (elem) => !LeftList.find(({ id }) => elem.id == id)
-            );
-            console.log("result left filter ", r);
-            setLeft(r);
-          });
+              //rigthList-->get articles from firebase
+              consulterListeArticlesCurrentUser(_user.uid).then((snapshot) => {
+                let rigthList = snapshot.docs.map((doc) => doc.data());
+                setArticle(rigthList);
+                console.log("Left Here", rigthList);
+                const r = rigthList.filter(
+                  (elem) => !LeftList.find(({ id }) => elem.id == id)
+                );
+                console.log("result left filter ", r);
+                setLeft(r);
+              });
+            }
+          );
         });
       })
+
       .catch((error) => {
         console.error("Error : ", error);
       });
 
     console.log("message");
   }, []);
-
-  const [checked, setChecked] = useState([]);
-  const [left, setLeft] = useState([]);
-  const [right, setRight] = useState([]);
-
-  const leftChecked = intersection(checked, left);
-  const rightChecked = intersection(checked, right);
 
   //select item
   const handleToggle = (value) => () => {
@@ -134,9 +143,19 @@ export default function TransferList() {
     //selectionner les id d'articles
     let listId = leftChecked.map((item) => item.id);
     console.log(listId);
+
     //mettre les id des articles dans idArticles de point de vente
     setIdArticlesToPointVente(id, listId);
-
+    leftChecked.forEach((element) => {
+      console.log("element", element);
+      element.nomPointVente = detail.titrePointVente;
+      element.idPointVente = detail.id;
+      console.log("element after update", element);
+      console.log("detail", detail);
+      updateArticle(element).then((result) => {
+        console.log(result);
+      });
+    });
     setRight(right.concat(leftChecked));
     setLeft(not(left, leftChecked));
     setChecked(not(checked, leftChecked));

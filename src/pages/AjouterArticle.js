@@ -14,7 +14,7 @@ import MenuItem from "@mui/material/MenuItem";
 import { styled } from "@mui/material/styles";
 import { storage } from "../Helpers/FireBase";
 import { createUUID } from "../Helpers/Helper";
-import { consulterListePointsVente } from "../controleurs/PointDeVenteControleur";
+import { consulterListePointsVenteCurrentUser } from "../controleurs/PointDeVenteControleur";
 import { setIdArticlesToPointVente } from "../controleurs/PointDeVenteControleur";
 import CircularProgress from "@mui/material/CircularProgress";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
@@ -148,22 +148,7 @@ export default function Ajouter() {
 
   useEffect(() => {
     console.log("use effect here");
-    //consulter liste des points de vente (nomPointVente)
-    consulterListePointsVente().then((snapshot) => {
-      console.log(snapshot);
-      let values = snapshot.docs.map((doc) => doc.data());
-      console.log("values", values);
-      setLoading(false);
-      //_listPTV array objet local pour cet fonction
-      let _listPTV = values.map((elem) => ({
-        value: elem.id,
-        label: elem.titrePointVente,
-      }));
-      console.log("_listPTV", _listPTV);
-      setListPTV(_listPTV);
 
-      console.log("listPTV  :", listPTV);
-    });
     //get connected user
     getConnectedUser().then((_user) => {
       console.log("_user", _user);
@@ -181,8 +166,25 @@ export default function Ajouter() {
             values.type,
             values.email
           );
+
           setUser(compte);
           console.log("compteUser", compte);
+          //consulter liste des points de vente (nomPointVente)
+          consulterListePointsVenteCurrentUser(_user.uid).then((snapshot) => {
+            console.log(snapshot);
+            let values = snapshot.docs.map((doc) => doc.data());
+            console.log("values", values);
+            setLoading(false);
+            //_listPTV array objet local pour cet fonction
+            let _listPTV = values.map((elem) => ({
+              value: elem.id,
+              label: elem.titrePointVente,
+            }));
+            console.log("_listPTV", _listPTV);
+            setListPTV(_listPTV);
+
+            console.log("listPTV  :", listPTV);
+          });
         })
         .catch((error) => {
           console.error("Error : ", error);
@@ -264,10 +266,7 @@ export default function Ajouter() {
     if (!data.typeArticle) {
       _errors.typeArticle = "Type article est obligatoire";
     } else _errors.typeArticle = "";
-    // verifier nom point de vente
-    if (!data.nomPointVente) {
-      _errors.nomPointVente = "Nom point vente est obligatoire";
-    } else _errors.nomPointVente = "";
+
     //verifier prix initial d'article
     if (!data.prixInitial) {
       _errors.prixInitial = "Prix initial est obligatoire";
@@ -322,8 +321,8 @@ export default function Ajouter() {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
 
-    var date = moment(dateV).format("L");
-    var _date = moment(dateR).format("L");
+    var date = dateV ? moment(dateV).format("L") : "";
+    var _date = dateR ? moment(dateR).format("L") : "";
     // data values of form
     const dataValues = {
       idCommercant: user.id,
@@ -444,8 +443,6 @@ export default function Ajouter() {
                         id="nomPointVente"
                         label="Nom point de vente"
                         name="nomPointVente"
-                        error={errors.nomPointVente ? true : false}
-                        helperText={errors.nomPointVente}
                         select
                         value={ptv.idPointVente}
                         onChange={handleChangePtv}
@@ -556,7 +553,7 @@ export default function Ajouter() {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              // error
+                              //error
                               // helperText="Your error message"
                               error={errors.datevalidite ? true : false}
                               helperText={errors.datevalidite}
@@ -588,8 +585,10 @@ export default function Ajouter() {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              error
-                              helperText="Your error message"
+                              //error
+                              //helperText="Your error message"
+                              error={errors.dateretrait ? true : false}
+                              helperText={errors.dateretrait}
                             />
                           )}
                         />

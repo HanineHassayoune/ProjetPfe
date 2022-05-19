@@ -1,10 +1,11 @@
 import { db } from "../Helpers/FireBase";
 
-export function getReservation() {
-  var docRef = db.collection("Reservation");
+export function getReservationCurrentUser(currentUser) {
+  var docRef = db
+    .collection("Reservation")
+    .where("idCommercant", "==", currentUser);
   return docRef.get();
 }
-
 export function updateReservation(data) {
   var docRef = db.collection("Reservation");
   return docRef.doc(data.reserverId).update(data);
