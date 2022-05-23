@@ -23,7 +23,13 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
-
+import * as React from "react";
+import Stack from "@mui/material/Stack";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 const status = [
   {
     value: "Disponible",
@@ -135,6 +141,20 @@ export default function ModifierArticle() {
     statut: "",
     description: "",
   });
+
+  const [open, setOpen] = React.useState(false);
+
+  const handleClickSuccess = () => {
+    setOpen(true);
+  };
+
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setOpen(false);
+  };
   //get id article from url
   let { id } = useParams();
   console.log(id);
@@ -305,8 +325,10 @@ export default function ModifierArticle() {
     if (isFormValid(data)) {
       console.log("form valid");
       modifierArticle(data);
-      alert("votre article est modifié avec succès");
-      navigate("/consulter/articles");
+      handleClickSuccess();
+      //window.location.reload(true);
+      //alert("votre article est modifié avec succès");
+      //navigate("/consulter/articles");
     } else console.log("form nom valid");
   };
 
@@ -620,6 +642,21 @@ export default function ModifierArticle() {
                   >
                     Modifier
                   </Button>
+                  <Stack spacing={2} sx={{ width: "100%" }}>
+                    <Snackbar
+                      open={open}
+                      autoHideDuration={6000}
+                      onClose={handleClose}
+                    >
+                      <Alert
+                        onClose={handleClose}
+                        severity="success"
+                        sx={{ width: "100%" }}
+                      >
+                        Votre article est modifié avec succès!
+                      </Alert>
+                    </Snackbar>
+                  </Stack>
                 </Box>
               </Box>
             </Container>

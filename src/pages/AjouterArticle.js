@@ -1,4 +1,5 @@
 import Avatar from "@mui/material/Avatar";
+import * as React from "react";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
@@ -25,8 +26,12 @@ import { useNavigate } from "react-router-dom";
 import { getConnectedUser } from "../Helpers/FireBase";
 import { getUserById } from "../controleurs/CompteControleur";
 import { CompteModel } from "../Models/CompteModel";
-import Alert from "@mui/material/Alert";
-
+import Stack from "@mui/material/Stack";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 const status = [
   {
     value: "Disponible",
@@ -141,6 +146,19 @@ export default function Ajouter() {
   });
   const theme = createTheme();
   const navigate = useNavigate();
+  const [open, setOpen] = React.useState(false);
+
+  const handleClickSuccess = () => {
+    setOpen(true);
+  };
+
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setOpen(false);
+  };
 
   useEffect(() => {
     console.log("use effect here");
@@ -190,9 +208,9 @@ export default function Ajouter() {
   }, []);
 
   //handleChange statut article
-  const handleChange = (event) => {
+  /* const handleChange = (event) => {
     setStatutArticle(event.target.value);
-  };
+  };*/
   //handleChange unite d'artilce
   const handleChangeUnite = (event) => {
     setUniteArticle(event.target.value);
@@ -347,8 +365,10 @@ export default function Ajouter() {
           console.log("dataValues ", dataValues);
           //ajouter des id articles to point vente [array d'id articles]
           setIdArticlesToPointVente(dataValues.idPointVente, [dataValues.id]);
-          alert("votre article est ajouté avec succès");
-          navigate("/consulter/articles");
+          //alert("votre article est ajouté avec succès");
+          handleClickSuccess();
+          //navigate("/consulter/articles");
+          window.location.reload(true);
         })
         .catch(() => {
           console.log("something went wrong !! ");
@@ -433,7 +453,6 @@ export default function Ajouter() {
                     <Grid item xs={12} sm={6}>
                       <TextField
                         margin="normal"
-                        required
                         fullWidth
                         id="nomPointVente"
                         label="Nom point de vente"
@@ -661,6 +680,21 @@ export default function Ajouter() {
                     >
                       Ajouter
                     </Button>
+                    <Stack spacing={2} sx={{ width: "100%" }}>
+                      <Snackbar
+                        open={open}
+                        autoHideDuration={6000}
+                        onClose={handleClose}
+                      >
+                        <Alert
+                          onClose={handleClose}
+                          severity="success"
+                          sx={{ width: "100%" }}
+                        >
+                          Votre article est ajouté avec succès!
+                        </Alert>
+                      </Snackbar>
+                    </Stack>
                   </Grid>
                 </Box>
               </Box>

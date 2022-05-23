@@ -307,23 +307,26 @@ export default function TransferList() {
               >
                 Detail du point de vente:
               </Typography>
-
-              <Card>
-                <Grid container spacing={10}>
-                  <Grid item xs={9} sm={4}>
+            </Grid>
+            <Grid item xs={9}>
+              <Card style={{ backgroundColor: "#e3f2fd" }}>
+                <Grid container spacing={35}>
+                  <Grid item xs={9} sm={4.5}>
                     <img src={detail.urlImagePtv} width="400" height="300" />
                   </Grid>
-                  <Grid item xs={9} sm={5}>
+                  <Grid item xs={9} sm={4.5}>
+                    <br />
+                    <br />
                     <Typography variant="h6">
                       Titre : {detail.titrePointVente}
                     </Typography>
-
+                    <br />
                     <Typography variant="h6">
                       Adresse:{detail.adressePointVente}
                     </Typography>
-
+                    <br />
                     <Typography variant="h6">Email:{detail.email}</Typography>
-
+                    <br />
                     <Typography variant="h6">
                       Numéro:{detail.numerotlf}
                     </Typography>

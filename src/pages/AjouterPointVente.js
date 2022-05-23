@@ -1,4 +1,5 @@
 import Avatar from "@mui/material/Avatar";
+import * as React from "react";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
@@ -9,8 +10,6 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import StorefrontIcon from "@mui/icons-material/Storefront";
 import { useState, useEffect } from "react";
 import { ajouterPointVente } from "../controleurs/PointDeVenteControleur";
-import Alert from "@mui/material/Alert";
-import AlertTitle from "@mui/material/AlertTitle";
 import { useNavigate } from "react-router-dom";
 import CircularProgress from "@mui/material/CircularProgress";
 import { getUserById } from "../controleurs/CompteControleur";
@@ -20,6 +19,12 @@ import { createUUID } from "../Helpers/Helper";
 import { Grid } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { getConnectedUser } from "../Helpers/FireBase";
+import Stack from "@mui/material/Stack";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 const theme = createTheme();
 
 export default function AjouterPointVente() {
@@ -44,9 +49,22 @@ export default function AjouterPointVente() {
     id: "",
     nom: "",
     prenom: "",
+    numerotlf: "",
     email: "",
   });
+  const [open, setOpen] = React.useState(false);
 
+  const handleClickSuccess = () => {
+    setOpen(true);
+  };
+
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setOpen(false);
+  };
   useEffect(() => {
     console.log("use effect here");
     //get connected user
@@ -168,9 +186,11 @@ export default function AjouterPointVente() {
       ajouterPointVente(dataValues)
         .then(() => {
           console.log("point de vente est ajouté");
-          alert("Votre point de vente est ajouté avec avec succès");
+          //alert("Votre point de vente est ajouté avec avec succès");
           console.log("______ ", dataValues);
-          navigate("/consulter/pointsvente");
+          handleClickSuccess();
+          window.location.reload(true);
+          //navigate("/consulter/pointsvente");
         })
         .catch(() => {
           console.log("something went wrong !! ");
@@ -272,7 +292,6 @@ export default function AjouterPointVente() {
                     <Grid item xs={12}>
                       <TextField
                         margin="normal"
-                        required
                         fullWidth
                         name="email"
                         label="Email"
@@ -285,7 +304,6 @@ export default function AjouterPointVente() {
                     <Grid item xs={12}>
                       <TextField
                         margin="normal"
-                        required
                         fullWidth
                         id="numerotlf"
                         label="Numéro téléphone"
@@ -327,6 +345,21 @@ export default function AjouterPointVente() {
                       </Button>
                     </Grid>
                   </Grid>
+                  <Stack spacing={2} sx={{ width: "100%" }}>
+                    <Snackbar
+                      open={open}
+                      autoHideDuration={6000}
+                      onClose={handleClose}
+                    >
+                      <Alert
+                        onClose={handleClose}
+                        severity="success"
+                        sx={{ width: "100%" }}
+                      >
+                        Votre point de vente est ajouté avec succès!
+                      </Alert>
+                    </Snackbar>
+                  </Stack>
                 </Box>
               </Box>
             </Container>

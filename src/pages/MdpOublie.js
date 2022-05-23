@@ -10,13 +10,15 @@ import Typography from "@mui/material/Typography";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useState } from "react";
 import KeyIcon from "@mui/icons-material/Key";
-
+import { forgotPassword } from "../controleurs/CompteControleur";
+import Link from "@mui/material/Link";
 const theme = createTheme();
 
 export default function MdpOublie() {
   const [errors, setErrors] = useState({
     email: "",
   });
+
   const pattern = new RegExp("^[a-zA-Z0-9]+@[a-zA-Z0-9]+.[A-Za-z]+$");
   const isFormValid = (data) => {
     const _errors = { ...errors };
@@ -42,6 +44,7 @@ export default function MdpOublie() {
 
     if (isFormValid(dataValues)) {
       console.log("form valid");
+      forgotPassword(dataValues.email);
     } else {
       console.log("form non valid");
     }
@@ -107,6 +110,9 @@ export default function MdpOublie() {
               >
                 Rechercher
               </Button>
+              <Link href="/connexion" variant="body2">
+                Connexion
+              </Link>
             </Box>
           </Box>
         </Grid>

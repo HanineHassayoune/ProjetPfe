@@ -158,9 +158,9 @@ export default function ConsulterArticles() {
                     <TableCell align="center" bgcolor="#e3f2fd">
                       Image article
                     </TableCell>
-                    <TableCell align="center" bgcolor="#e3f2fd">
+                    {/*<TableCell align="center" bgcolor="#e3f2fd">
                       Id article
-                    </TableCell>
+                   </TableCell>*/}
                     <TableCell align="center" bgcolor="#e3f2fd">
                       Titre article
                     </TableCell>
@@ -212,7 +212,7 @@ export default function ConsulterArticles() {
                       <TableCell align="center">
                         <img src={row.urlImage} width="100" height="60" />
                       </TableCell>
-                      <TableCell align="center">{row.id}</TableCell>
+                      {/*<TableCell align="center">{row.id}</TableCell>*/}
                       <TableCell align="center">{row.titreArticle}</TableCell>
                       <TableCell align="center">{row.typeArticle}</TableCell>
                       <TableCell align="center" bgcolor="#e3f2fd">
@@ -227,7 +227,9 @@ export default function ConsulterArticles() {
                       </TableCell>
                       <TableCell align="center">{row.datevalidite}</TableCell>
                       <TableCell align="center">{row.dateretrait}</TableCell>
-                      <TableCell align="center">{row.statut}</TableCell>
+                      <TableCell align="center" bgcolor="#e3f2fd">
+                        {row.statut}
+                      </TableCell>
                       <TableCell align="center">{row.description}</TableCell>
 
                       <TableCell align="center">
@@ -264,7 +266,7 @@ export default function ConsulterArticles() {
               <Box sx={style}>
                 <Typography variant="h5" align="center" color="primary">
                   <ReportProblemIcon color="error" sx={{ fontSize: 38 }} />
-                  Vous êtes sur de supprimer ce produit {selectId}!
+                  Vous êtes sur de supprimer ce produit !
                 </Typography>
                 <Button
                   variant="outlined"

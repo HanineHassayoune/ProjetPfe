@@ -83,9 +83,9 @@ export default function ConsulterPointsVente() {
               <TableCell align="center" bgcolor="#e3f2fd">
                 Image point vente
               </TableCell>
-              <TableCell align="center" bgcolor="#e3f2fd">
+              {/*<TableCell align="center" bgcolor="#e3f2fd">
                 Id point vente
-              </TableCell>
+  </TableCell>*/}
               <TableCell align="center" bgcolor="#e3f2fd">
                 Titre point vente
               </TableCell>
@@ -112,7 +112,7 @@ export default function ConsulterPointsVente() {
                 <TableCell align="center">
                   <img src={row.urlImagePtv} width="120" height="70" />
                 </TableCell>
-                <TableCell align="center">{row.id}</TableCell>
+                {/*<TableCell align="center">{row.id}</TableCell>*/}
                 <TableCell align="center">{row.titrePointVente}</TableCell>
                 <TableCell align="center">{row.adressePointVente}</TableCell>
                 <TableCell align="center">{row.email}</TableCell>

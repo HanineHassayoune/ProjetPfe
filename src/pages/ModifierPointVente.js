@@ -19,7 +19,13 @@ import { createUUID } from "../Helpers/Helper";
 import { Grid } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import CircularProgress from "@mui/material/CircularProgress";
-
+import * as React from "react";
+import Stack from "@mui/material/Stack";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 export default function ModifierPointVente() {
   //get id point de vente from url
   let { id } = useParams();
@@ -37,6 +43,8 @@ export default function ModifierPointVente() {
   const [data, setData] = useState({
     titrePointVente: "",
     adressePointVente: "",
+    latitude: "",
+    longitude: "",
     email: "",
     numerotlf: "",
     urlImagePtv: "",
@@ -51,7 +59,19 @@ export default function ModifierPointVente() {
   const Input = styled("input")({
     display: "none",
   });
+  const [open, setOpen] = React.useState(false);
 
+  const handleClickSuccess = () => {
+    setOpen(true);
+  };
+
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setOpen(false);
+  };
   useEffect(() => {
     console.log("use effect here ");
     //get point de vente by id
@@ -176,8 +196,10 @@ export default function ModifierPointVente() {
     if (isFormValid(data)) {
       console.log("form valid");
       modifierPointVente(data);
-      alert("votre point de vente est modifié avec succès");
-      navigate("/consulter/pointsvente");
+      //alert("votre point de vente est modifié avec succès");
+      //navigate("/consulter/pointsvente");
+      handleClickSuccess();
+      //window.location.reload(true);
     } else console.log("form non valid");
   };
   return (
@@ -282,34 +304,24 @@ export default function ModifierPointVente() {
                   <Grid item xs={12}>
                     <TextField
                       margin="normal"
-                      required
                       fullWidth
                       name="email"
                       label="Email"
                       type="email"
                       id="email"
-                      // autoComplete="email"
                       disabled
-                      // error={errors.email ? true : false}
-                      // helperText={errors.email}
-                      // onChange={(e) => handleChange(e)}
                       value={data.email}
                     />
                   </Grid>
                   <Grid item xs={12}>
                     <TextField
                       margin="normal"
-                      required
                       fullWidth
                       name="numerotlf"
                       label="Numéro téléphone"
                       type="numerotlf"
                       id="numerotlf"
-                      // autoComplete="numerotlf"
                       disabled
-                      //error={errors.numerotlf ? true : false}
-                      // helperText={errors.numerotlf}
-                      //onChange={(e) => handleChange(e)}
                       value={data.numerotlf}
                     />
                   </Grid>
@@ -342,6 +354,21 @@ export default function ModifierPointVente() {
                   >
                     Modifier
                   </Button>
+                  <Stack spacing={2} sx={{ width: "100%" }}>
+                    <Snackbar
+                      open={open}
+                      autoHideDuration={6000}
+                      onClose={handleClose}
+                    >
+                      <Alert
+                        onClose={handleClose}
+                        severity="success"
+                        sx={{ width: "100%" }}
+                      >
+                        Votre point de vente est modifié avec succès!
+                      </Alert>
+                    </Snackbar>
+                  </Stack>
                 </Box>
               </Box>
             </Container>

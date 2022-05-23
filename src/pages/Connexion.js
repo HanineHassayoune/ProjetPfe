@@ -14,9 +14,14 @@ import { useState, useEffect } from "react";
 import { getUserById, login } from "../controleurs/CompteControleur";
 import { CompteModel } from "../Models/CompteModel";
 import { useNavigate } from "react-router-dom";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
+import Stack from "@mui/material/Stack";
 
 const theme = createTheme();
-
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 export default function Connexion() {
   const [errors, setErrors] = useState({
     email: "",
@@ -35,8 +40,6 @@ export default function Connexion() {
 
     if (!data.password) {
       _errors.password = "Mots de passe est obligatoire";
-    } else if (data.password.length < 6) {
-      _errors.password = "Mots de passe doit etre superieure 6";
     } else _errors.password = "";
     setErrors(_errors);
     //console.log(_errors);
@@ -53,6 +56,16 @@ export default function Connexion() {
     email: "",
     password: "",
   });
+  const [open, setOpen] = React.useState(false);
+  const handleClickError = () => {
+    setOpen(true);
+  };
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpen(false);
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -62,28 +75,24 @@ export default function Connexion() {
       password: data.get("password"),
     };
 
-    /*if (isFormValid(dataValues)) {
-      console.log("form valid");
-      await login(form);
+    //connexion after validation form
+    if (isFormValid(dataValues)) {
+      let user = await login(form);
+      console.log("user", user);
+      console.log(" user.id", user.uid);
+      let _user = await getUserById(user.uid);
+      console.log("Hello connected user", _user.data().type.toUpperCase());
+      if (_user.exists && _user.data().type.toUpperCase() == "COMMERCANT") {
+        _user.data();
+        console.log("_user", _user.data());
+        navigate("/statistique");
+      } else {
+        console.log("user n'existe pas");
+        handleClickError();
+      }
     } else {
       console.log("form non valid");
-    }*/
-
-    let user = await login(form);
-    console.log("user", user);
-    console.log(" user.id", user.uid);
-    let _user = await getUserById(user.uid);
-    console.log("Hello connected user", _user.data().type.toUpperCase());
-    if (_user.exists && _user.data().type.toUpperCase() == "COMMERCANT") {
-      _user.data();
-      console.log("_user", _user.data());
-      navigate("/statistique");
-    } else {
-      console.log("user n'existe pas");
-      alert("compte n'existe pas");
     }
-
-    //methode -->get user by id (id) -->return element :commercant (page statistic)sinon: autre type d'utilisateur(errer) + log out
   };
 
   return (
@@ -152,7 +161,6 @@ export default function Connexion() {
                 helperText={errors.password}
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
               />
-
               <Button
                 type="submit"
                 fullWidth
@@ -161,6 +169,21 @@ export default function Connexion() {
               >
                 Connexion
               </Button>
+              <Stack spacing={2} sx={{ width: "100%" }}>
+                <Snackbar
+                  open={open}
+                  autoHideDuration={6000}
+                  onClose={handleClose}
+                >
+                  <Alert
+                    onClose={handleClose}
+                    severity="error"
+                    sx={{ width: "100%" }}
+                  >
+                    Ce compte n'existe pas!
+                  </Alert>
+                </Snackbar>
+              </Stack>
 
               <Grid container>
                 <Grid item xs>

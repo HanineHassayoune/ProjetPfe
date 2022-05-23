@@ -51,14 +51,8 @@ export const login = async ({ email, password }) => {
 
 export function updateCompte(data) {
   var docRef = db.collection("Comptes");
-  // updateEmailUserFromAuth(data.email);
   return docRef.doc(data.id).update(data);
 }
-
-/*export function updateEmailUserFromAuth(newEmail) {
-  var user = firebase.auth().currentUser;
-  return user.updateEmail(newEmail);
-}*/
 
 export function Deconnexion() {
   firebase
@@ -72,7 +66,8 @@ export function Deconnexion() {
     });
 }
 
-/*export const forgotPassword = (Email) => {
+export const forgotPassword = (Email) => {
+  console.log("Emaaillll", Email);
   firebase
     .auth()
     .sendPasswordResetEmail(Email)
@@ -83,4 +78,3 @@ export function Deconnexion() {
       console.log(e);
     });
 };
-*/

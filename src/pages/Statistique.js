@@ -37,6 +37,7 @@ import { consulterListeArticlesCurrentUser } from "../controleurs/ArticleControl
 const Statistique = () => {
   const [rows, setRows] = useState([]);
   const [articles, setArticles] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   // Sample data
   /* const data = [
@@ -53,7 +54,7 @@ const Statistique = () => {
   }));
 
   let cercle = articles.map((element) => ({
-    argument: element.titreArticle,
+    argument: element.typeArticle,
     value: parseInt(element.quantite),
   }));
   console.log("cercle", cercle);
@@ -70,7 +71,7 @@ const Statistique = () => {
   const handleChange = (event, row) => {
     event.preventDefault();
     let _quantiteDispo =
-      parseInt(row.quantiteArticle) - parseInt(row.quantiteReserve);
+      parseInt(row.quantiteArticle) - parseInt(row.quantiteReserve); 
     if (_quantiteDispo < 0) {
       console.log("quantité negative");
       return;
@@ -84,7 +85,7 @@ const Statistique = () => {
       const article = {
         id: row.idArticle,
         quantite: _quantiteDispo,
-        statut: _quantiteDispo == 0 ? "Retiré" : "Diponible",
+        statut: _quantiteDispo == 0 ? "Retiré" : "Disponible",
       };
       updateArticle(article).then(() => {
         /* const updateReservation = {
@@ -115,6 +116,7 @@ const Statistique = () => {
   useEffect(() => {
     console.log("use effect here ");
     getConnectedUser().then((_user) => {
+      setLoading(false);
       // get list reservations
       if (rows.length == 0) {
         getReservationCurrentUser(_user.uid).then((response) => {
@@ -201,97 +203,127 @@ const Statistique = () => {
   }, [rows.length]);
 
   return (
-    <Grid container spacing={2}>
-      <Grid item xs={12} sm={6}>
-        <Paper elevation={3}>
-          <Chart data={cercle}>
-            <PieSeries valueField="value" argumentField="argument" />
-            <Title text="Quantités d'articles par type" />
-          </Chart>
-        </Paper>
-      </Grid>
-      <Grid item xs={12} sm={6}>
-        <Paper elevation={3}>
-          <Chart data={diagrammeBatons}>
-            <ArgumentAxis />
-            <ValueAxis />
-            <BarSeries valueField="value" argumentField="argument" />
-          </Chart>
-        </Paper>
-      </Grid>
+    <>
+      {loading ? (
+        <>
+          <Typography
+            variant="h4"
+            color="primary"
+            sx={{ fontFamily: "cursive" }}
+          >
+            Loading <CircularProgress />
+          </Typography>
+        </>
+      ) : (
+        <>
+          <Grid container spacing={2}>
+            {/* cercle*/}
+            <Grid item xs={12} sm={6}>
+              <Paper elevation={3}>
+                <Chart data={cercle} >
+                  <PieSeries valueField="value" argumentField="argument" />
+                  <Title text="Quantités d'articles par type" />
+                </Chart>
+              </Paper>
+            </Grid>
+            {/* diagrammeBatons*/}
+            <Grid item xs={12} sm={6}>
+              <Paper elevation={3}>
+                <Chart data={diagrammeBatons}>
+                  <ArgumentAxis />
+                  <ValueAxis />
+                  <BarSeries valueField="value" argumentField="argument" />
+                </Chart>
+              </Paper>
+            </Grid>
 
-      <Grid item xs={12}>
-        <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 650 }} aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                <TableCell align="center" bgcolor="#e3f2fd">
-                  Email client
-                </TableCell>
-                <TableCell align="center" bgcolor="#e3f2fd">
-                  Titre article
-                </TableCell>
-                <TableCell align="center" bgcolor="#e3f2fd">
-                  Quantité disponible
-                </TableCell>
-                <TableCell align="center" bgcolor="#e3f2fd">
-                  Quantité reservé
-                </TableCell>
-                <TableCell align="center" bgcolor="#e3f2fd">
-                  Titre point vente
-                </TableCell>
+            <Grid item xs={12}>
+              <TableContainer component={Paper}>
+                <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell align="center" bgcolor="#e3f2fd">
+                        Email client
+                      </TableCell>
+                      <TableCell align="center" bgcolor="#e3f2fd">
+                        Titre article
+                      </TableCell>
+                      <TableCell align="center" bgcolor="#e3f2fd">
+                        Quantité disponible
+                      </TableCell>
+                      <TableCell align="center" bgcolor="#e3f2fd">
+                        Quantité reservé
+                      </TableCell>
+                      <TableCell align="center" bgcolor="#e3f2fd">
+                        Titre point vente
+                      </TableCell>
 
-                <TableCell align="center" bgcolor="#e3f2fd">
-                  Statut
-                </TableCell>
-                <TableCell align="center" bgcolor="#e3f2fd">
-                  Date réservation
-                </TableCell>
-                <TableCell align="center" bgcolor="#e3f2fd">
-                  Id réservation
-                </TableCell>
-                <TableCell align="center" bgcolor="#e3f2fd">
-                  Action
-                </TableCell>
-              </TableRow>
-            </TableHead>
+                      <TableCell align="center" bgcolor="#e3f2fd">
+                        Statut
+                      </TableCell>
+                      <TableCell align="center" bgcolor="#e3f2fd">
+                        Date réservation
+                      </TableCell>
+                      <TableCell align="center" bgcolor="#e3f2fd">
+                        Id réservation
+                      </TableCell>
+                      <TableCell align="center" bgcolor="#e3f2fd">
+                        Action
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
 
-            <TableBody>
-              {rows.map((row, id) => (
-                <TableRow
-                  key={id}
-                  sx={{
-                    "&:last-child td, &:last-child th": { border: 0 },
-                  }}
-                >
-                  <TableCell align="center">{row.emailClient}</TableCell>
-                  <TableCell align="center">{row.titreArticle}</TableCell>
-                  <TableCell align="center">{row.quantiteArticle}</TableCell>
-                  <TableCell align="center">{row.quantiteReserve}</TableCell>
-                  <TableCell align="center">{row.titrePointVente}</TableCell>
-                  <TableCell align="center">{row.statutReservation}</TableCell>
-                  <TableCell align="center">{row.dateReservation}</TableCell>
-                  <TableCell align="center">{row.idReservation}</TableCell>
-                  <TableCell align="center">
-                    <Button
-                      variant="contained"
-                      onClick={(event) => {
-                        handleChange(event, row);
-                      }}
-                      disabled={
-                        parseInt(row.quantiteArticle) > 0 ? false : true
-                      }
-                    >
-                      Retirer
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Grid>
-    </Grid>
+                  <TableBody>
+                    {rows.map((row, id) => (
+                      <TableRow
+                        key={id}
+                        sx={{
+                          "&:last-child td, &:last-child th": { border: 0 },
+                        }}
+                      >
+                        <TableCell align="center">{row.emailClient}</TableCell>
+                        <TableCell align="center">{row.titreArticle}</TableCell>
+                        <TableCell align="center">
+                          {row.quantiteArticle}
+                        </TableCell>
+                        <TableCell align="center">
+                          {row.quantiteReserve}
+                        </TableCell>
+                        <TableCell align="center">
+                          {row.titrePointVente}
+                        </TableCell>
+                        <TableCell align="center">
+                          {row.statutReservation}
+                        </TableCell>
+                        <TableCell align="center">
+                          {row.dateReservation}
+                        </TableCell>
+                        <TableCell align="center">
+                          {row.idReservation}
+                        </TableCell>
+                        <TableCell align="center">
+                          <Button
+                            variant="contained"
+                            onClick={(event) => {
+                              handleChange(event, row);
+                            }}
+                            disabled={
+                              parseInt(row.quantiteArticle) > 0 ? false : true
+                            }
+                          >
+                            Retirer
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Grid>
+          </Grid>
+        </>
+      )}
+    </>
   );
 };
 

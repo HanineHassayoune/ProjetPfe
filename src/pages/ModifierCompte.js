@@ -1,5 +1,6 @@
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
+import * as React from "react";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
@@ -12,6 +13,12 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { updateCompte, getUserById } from "../controleurs/CompteControleur";
 import { CompteModel } from "../Models/CompteModel";
 import { getConnectedUser } from "../Helpers/FireBase";
+import Stack from "@mui/material/Stack";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 export default function ModifierCompte() {
   const regNum = new RegExp("^[0-9\b]+$");
@@ -100,6 +107,18 @@ export default function ModifierCompte() {
         });
     });
   }, []);
+
+  const [open, setOpen] = useState(false);
+  const handleClickSuccess = () => {
+    setOpen(true);
+  };
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpen(false);
+  };
+
   // handleChange values of user
   const handleChange = (event) => {
     setUser({ ...user, [event.target.name]: event.target.value });
@@ -107,9 +126,12 @@ export default function ModifierCompte() {
   //handle submit form after validation
   const handleSubmit = (event) => {
     event.preventDefault();
+    console.log("user 123 ", user);
     if (isFormValid(user)) {
       updateCompte(user);
-      alert("votre compte est modifié avec succès");
+      handleClickSuccess();
+      //window.location.reload(true);
+      //alert("votre compte est modifié avec succès");
       console.log("user after update", user);
     }
   };
@@ -213,6 +235,21 @@ export default function ModifierCompte() {
                   >
                     Modifier
                   </Button>
+                  <Stack spacing={2} sx={{ width: "100%" }}>
+                    <Snackbar
+                      open={open}
+                      autoHideDuration={6000}
+                      onClose={handleClose}
+                    >
+                      <Alert
+                        onClose={handleClose}
+                        severity="success"
+                        sx={{ width: "100%" }}
+                      >
+                        Votre compte est modifié avec succès!
+                      </Alert>
+                    </Snackbar>
+                  </Stack>
                 </Box>
               </Box>
             </Container>
