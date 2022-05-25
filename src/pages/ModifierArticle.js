@@ -43,6 +43,10 @@ const status = [
     value: "Nouveau",
     label: "Nouveau",
   },
+  {
+    value: "Retiré",
+    label: "Retiré",
+  },
 ];
 const Unite = [
   {
@@ -534,7 +538,13 @@ export default function ModifierArticle() {
                             console.log(date);
                             setData({ ...data, datevalidite: date });
                           }}
-                          renderInput={(params) => <TextField {...params} />}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              error={errors.datevalidite ? true : false}
+                              helperText={errors.datevalidite}
+                            />
+                          )}
                         />
                       </LocalizationProvider>
                     </Grid>
@@ -565,7 +575,13 @@ export default function ModifierArticle() {
                             console.log(date);
                             setData({ ...data, dateretrait: date });
                           }}
-                          renderInput={(params) => <TextField {...params} />}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              error={errors.dateretrait ? true : false}
+                              helperText={errors.dateretrait}
+                            />
+                          )}
                         />
                       </LocalizationProvider>
                     </Grid>

@@ -267,7 +267,7 @@ export default function Menu({ children }) {
         <ListItem
           button
           onClick={() => {
-            Deconnexion(navigate("/connexion"));
+            Deconnexion(navigate("/"));
           }}
         >
           <ListItemIcon>

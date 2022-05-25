@@ -51,7 +51,7 @@ export const login = async ({ email, password }) => {
 
 export function updateCompte(data) {
   var docRef = db.collection("Comptes");
-  return docRef.doc(data.id).update(data);
+  return docRef.doc(data.id).update(Object.assign({}, data));
 }
 
 export function Deconnexion() {

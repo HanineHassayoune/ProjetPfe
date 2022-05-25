@@ -110,7 +110,7 @@ export default function MdpOublie() {
               >
                 Rechercher
               </Button>
-              <Link href="/connexion" variant="body2">
+              <Link href="/" variant="body2">
                 Connexion
               </Link>
             </Box>

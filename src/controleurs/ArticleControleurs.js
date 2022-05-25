@@ -58,7 +58,7 @@ export function getArticleById(id) {
 
 export function updateArticle(data) {
   var docRef = db.collection("Articles");
-  return docRef.doc(data.id).update(data);
+  return docRef.doc(data.id).update(Object.assign({}, data));
 }
 
 //let LeftList = snapshot.docs.map((doc) => doc.data());

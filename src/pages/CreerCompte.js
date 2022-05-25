@@ -14,15 +14,12 @@ import { creerCompte } from "../controleurs/CompteControleur";
 import Link from "@mui/material/Link";
 import { register } from "../controleurs/CompteControleur";
 import { useNavigate } from "react-router-dom";
-import Snackbar from "@mui/material/Snackbar";
-import Stack from "@mui/material/Stack";
-import MuiAlert from "@mui/material/Alert";
-
 const theme = createTheme();
-const Alert = React.forwardRef(function Alert(props, ref) {
-  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
+
 export default function CreerCompte() {
+  const regNom = new RegExp("^[a-zA-Z]+ [a-zA-Z]+|[a-zA-Z]+$");
+  const pattern = new RegExp("^[a-zA-Z0-9]+@[a-zA-Z0-9]+.[A-Za-z]+$");
+  const regNum = new RegExp("^[0-9\b]+$");
   const [errors, setErrors] = useState({
     nom: "",
     prenom: "",
@@ -38,9 +35,6 @@ export default function CreerCompte() {
     password: "",
   });
   const navigate = useNavigate();
-  const regNom = new RegExp("^[a-zA-Z]+ [a-zA-Z]+|[a-zA-Z]+$");
-  const pattern = new RegExp("^[a-zA-Z0-9]+@[a-zA-Z0-9]+.[A-Za-z]+$");
-  const regNum = new RegExp("^[0-9\b]+$");
   const isFormValid = (data) => {
     const _errors = { ...errors };
     //verifier nom
@@ -73,27 +67,12 @@ export default function CreerCompte() {
     //verifier password
     /* if (!data.password) {
       _errors.password = "Le mots de passe est obligatoire";
-    } else if (data.password.length < 6) {
-      _errors.password = "Mots de passe doit etre superieure 6";
     } else _errors.password = "";*/
     //set errors
     setErrors(_errors);
     if (Object.values(_errors).filter((item) => item).length === 0) {
       return true;
     } else return false;
-  };
-  const [open, setOpen] = React.useState(false);
-
-  const handleClickSuccess = () => {
-    setOpen(true);
-  };
-
-  const handleClose = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-
-    setOpen(false);
   };
 
   const handleSubmit = async (event) => {
@@ -110,8 +89,6 @@ export default function CreerCompte() {
       console.log("form valid");
       await register(form);
       await creerCompte(dataValues);
-      //handleClickSuccess();
-      alert("votre compte est créer avec succsé");
       navigate("/statistique");
     } else {
       console.log("form non valid");
@@ -227,22 +204,6 @@ export default function CreerCompte() {
               >
                 S'inscrire
               </Button>
-              <Stack spacing={2} sx={{ width: "100%" }}>
-                <Snackbar
-                  open={open}
-                  autoHideDuration={6000}
-                  onClose={handleClose}
-                >
-                  <Alert
-                    onClose={handleClose}
-                    severity="success"
-                    sx={{ width: "100%" }}
-                  >
-                    Votre compte est créer avec succé!
-                  </Alert>
-                </Snackbar>
-              </Stack>
-
               <Grid container>
                 <Grid item xs>
                   <Link href="/mdp/oublie" variant="body2">
@@ -250,7 +211,7 @@ export default function CreerCompte() {
                   </Link>
                 </Grid>
                 <Grid item>
-                  <Link href="/connexion" variant="body2">
+                  <Link href="/" variant="body2">
                     {"Connexion"}
                   </Link>
                 </Grid>

@@ -9,7 +9,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/connexion" element={<Connexion />}></Route>
+        <Route path="/" element={<Connexion />}></Route>
         <Route path="/creer/compte" element={<CreerCompte />}></Route>
         <Route path="/mdp/oublie" element={<MdpOublie />}></Route>
         <Route path="*" element={<DefaultLayout />} />

@@ -1,6 +1,10 @@
 import React from "react";
 //import Paper from "@material-ui/core/Paper";
 import Paper from "@mui/material/Paper";
+import BarChart from "./BarChart";
+import LineChart from "./LineChart";
+import PieChart from "./PieChart";
+import { UserData } from "./Data";
 import {
   Chart,
   PieSeries,
@@ -23,7 +27,6 @@ import { getReservationCurrentUser } from "../controleurs/ReservationControleur"
 import { getListClientByListId } from "../controleurs/CompteControleur";
 import {
   getListArticlesByListId,
-  getArticleById,
   updateArticle,
 } from "../controleurs/ArticleControleurs";
 import { getListPointVenteByListId } from "../controleurs/PointDeVenteControleur";
@@ -39,39 +42,12 @@ const Statistique = () => {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Sample data
-  /* const data = [
-    { argument: "Lundi", value: 10 },
-    { argument: "Mardi", value: 10 },
-    { argument: "Mercredi", value: 20 },
-    { argument: "Jeudi", value: 20 },
-    { argument: "Vendredi", value: 10 },
-    { argument: "Samedi", value: 30 },
-  ];*/
-  let diagrammeBatons = rows.map((elem) => ({
-    argument: elem.dateReservation,
-    value: elem.quantiteReserve,
-  }));
-
-  let cercle = articles.map((element) => ({
-    argument: element.typeArticle,
-    value: parseInt(element.quantite),
-  }));
-  console.log("cercle", cercle);
-  /*const diagrammeBatons = [
-    { argument: "Monday", value: 30 },
-    { argument: "Tuesday", value: 20 },
-    { argument: "Wednesday", value: 10 },
-    { argument: "Thursday", value: 50 },
-    { argument: "Friday", value: 60 },
-  ];
-*/
   console.log("rowssssssssssssssssss", rows);
   //change statut d'article et quantité restante
   const handleChange = (event, row) => {
     event.preventDefault();
     let _quantiteDispo =
-      parseInt(row.quantiteArticle) - parseInt(row.quantiteReserve); 
+      parseInt(row.quantiteArticle) - parseInt(row.quantiteReserve);
     if (_quantiteDispo < 0) {
       console.log("quantité negative");
       return;
@@ -112,6 +88,45 @@ const Statistique = () => {
       });
     });
   };
+  // les Batons : quantité se réservation en fonctions des dates
+  const [userData, setUserData] = useState({
+    labels: [],
+    datasets: [
+      {
+        label: "",
+        data: [],
+        backgroundColor: [
+          "rgba(75,192,192,1)",
+          "#ecf0f1",
+          "#50AF95",
+          "#f3ba2f",
+          "#2a71d0",
+        ],
+        borderColor: "black",
+        borderWidth: 2,
+      },
+    ],
+  });
+
+  //Cercle : quantité d'article par chaque type
+  const [cercleData, setCercleData] = useState({
+    labels: [],
+    datasets: [
+      {
+        label: "",
+        data: [],
+        backgroundColor: [
+          "rgba(75,192,192,1)",
+          "#ecf0f1",
+          "#50AF95",
+          "#f3ba2f",
+          "#2a71d0",
+        ],
+        borderColor: "black",
+        borderWidth: 2,
+      },
+    ],
+  });
 
   useEffect(() => {
     console.log("use effect here ");
@@ -120,6 +135,8 @@ const Statistique = () => {
       // get list reservations
       if (rows.length == 0) {
         getReservationCurrentUser(_user.uid).then((response) => {
+          console.log(response);
+          if (response.empty) return;
           let _reservations = response.docs.map((doc) => doc.data());
           console.log("reservations", _reservations);
           //get list id client from reservation
@@ -182,6 +199,30 @@ const Statistique = () => {
                       }
                       setRows(_rows);
                       console.log("_rows", _rows);
+                      const Data = _rows.map((elem) => ({
+                        id: elem.idReservation,
+                        date: elem.dateReservation,
+                        quantite: elem.quantiteReserve,
+                      }));
+                      console.log(Data);
+                      setUserData({
+                        labels: Data.map((data) => data.date),
+                        datasets: [
+                          {
+                            label: "Quantité réservée par jour",
+                            data: Data.map((data) => data.quantite),
+                            backgroundColor: [
+                              "rgba(75,192,192,1)",
+                              "#ecf0f1",
+                              "#50AF95",
+                              "#f3ba2f",
+                              "#2a71d0",
+                            ],
+                            borderColor: "black",
+                            borderWidth: 2,
+                          },
+                        ],
+                      });
                     }
                   );
                 }
@@ -194,6 +235,30 @@ const Statistique = () => {
             let values = articles.docs.map((doc) => doc.data());
             console.log("values", values);
             setArticles(values);
+            const DataType = values.map((elem) => ({
+              id: elem.id,
+              type: elem.typeArticle,
+              quantite: parseInt(elem.quantite),
+            }));
+            console.log("DataType", DataType);
+            setCercleData({
+              labels: DataType.map((data) => data.type),
+              datasets: [
+                {
+                  label: "Type d'article par quantité",
+                  data: DataType.map((data) => data.quantite),
+                  backgroundColor: [
+                    "rgba(75,192,192,1)",
+                    "#ecf0f1",
+                    "#50AF95",
+                    "#f3ba2f",
+                    "#2a71d0",
+                  ],
+                  borderColor: "black",
+                  borderWidth: 2,
+                },
+              ],
+            });
           })
           .catch((error) => {
             console.error("Error : ", error);
@@ -216,25 +281,19 @@ const Statistique = () => {
         </>
       ) : (
         <>
-          <Grid container spacing={2}>
-            {/* cercle*/}
+          <Grid
+            container
+            spacing={2}
+            justifyContent="center"
+            alignItems="center"
+          >
+            {/* Les batons*/}
             <Grid item xs={12} sm={6}>
-              <Paper elevation={3}>
-                <Chart data={cercle} >
-                  <PieSeries valueField="value" argumentField="argument" />
-                  <Title text="Quantités d'articles par type" />
-                </Chart>
-              </Paper>
+              <BarChart chartData={userData} />
             </Grid>
-            {/* diagrammeBatons*/}
+            {/* courbe*/}
             <Grid item xs={12} sm={6}>
-              <Paper elevation={3}>
-                <Chart data={diagrammeBatons}>
-                  <ArgumentAxis />
-                  <ValueAxis />
-                  <BarSeries valueField="value" argumentField="argument" />
-                </Chart>
-              </Paper>
+              <LineChart chartData={cercleData} />
             </Grid>
 
             <Grid item xs={12}>
@@ -264,9 +323,9 @@ const Statistique = () => {
                       <TableCell align="center" bgcolor="#e3f2fd">
                         Date réservation
                       </TableCell>
-                      <TableCell align="center" bgcolor="#e3f2fd">
+                      {/*<TableCell align="center" bgcolor="#e3f2fd">
                         Id réservation
-                      </TableCell>
+                      </TableCell>*/}
                       <TableCell align="center" bgcolor="#e3f2fd">
                         Action
                       </TableCell>
@@ -298,9 +357,9 @@ const Statistique = () => {
                         <TableCell align="center">
                           {row.dateReservation}
                         </TableCell>
-                        <TableCell align="center">
+                        {/*<TableCell align="center">
                           {row.idReservation}
-                        </TableCell>
+                      </TableCell>*/}
                         <TableCell align="center">
                           <Button
                             variant="contained"
@@ -319,6 +378,12 @@ const Statistique = () => {
                   </TableBody>
                 </Table>
               </TableContainer>
+            </Grid>
+            {/* Cercle*/}
+            <Grid item xs={12}>
+              <div style={{ width: 500 }}>
+                <PieChart chartData={cercleData} />
+              </div>
             </Grid>
           </Grid>
         </>

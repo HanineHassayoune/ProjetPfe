@@ -295,14 +295,14 @@ export default function TransferList() {
             justifyContent="center"
             alignItems="center"
           >
-            {/* detail du point vente */}
+            {/* detail du point vente */}/{" "}
             <Grid item xs={9}>
               <Typography
                 component="h1"
                 variant="h3"
                 align="center"
-                gutterBottom
-                marginTop="30px"
+                // gutterBottom
+                marginTop="10px"
                 sx={{ fontFamily: "cursive" }}
               >
                 Detail du point de vente:
@@ -310,11 +310,11 @@ export default function TransferList() {
             </Grid>
             <Grid item xs={9}>
               <Card style={{ backgroundColor: "#e3f2fd" }}>
-                <Grid container spacing={35}>
-                  <Grid item xs={9} sm={4.5}>
+                <Grid container>
+                  <Grid item xs>
                     <img src={detail.urlImagePtv} width="400" height="300" />
                   </Grid>
-                  <Grid item xs={9} sm={4.5}>
+                  <Grid item xs>
                     <br />
                     <br />
                     <Typography variant="h6">
@@ -322,13 +322,13 @@ export default function TransferList() {
                     </Typography>
                     <br />
                     <Typography variant="h6">
-                      Adresse:{detail.adressePointVente}
+                      Adresse : {detail.adressePointVente}
                     </Typography>
                     <br />
-                    <Typography variant="h6">Email:{detail.email}</Typography>
+                    <Typography variant="h6">Email : {detail.email}</Typography>
                     <br />
                     <Typography variant="h6">
-                      Numéro:{detail.numerotlf}
+                      Numéro : {detail.numerotlf}
                     </Typography>
                   </Grid>
                 </Grid>

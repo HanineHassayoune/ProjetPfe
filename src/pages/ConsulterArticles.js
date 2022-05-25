@@ -17,6 +17,7 @@ import Button from "@mui/material/Button";
 import CancelIcon from "@mui/icons-material/Cancel";
 import ReportProblemIcon from "@mui/icons-material/ReportProblem";
 import { consulterListeArticlesCurrentUser } from "../controleurs/ArticleControleurs";
+import Badge from "@mui/material/Badge";
 import {
   deleteArticle,
   deleteArticleFromPointVente,
@@ -30,6 +31,7 @@ import {
 import { getConnectedUser } from "../Helpers/FireBase";
 import { CompteModel } from "../Models/CompteModel";
 import { getUserById } from "../controleurs/CompteControleur";
+import SentimentVeryDissatisfiedIcon from "@mui/icons-material/SentimentVeryDissatisfied";
 //conposant react
 export default function ConsulterArticles() {
   const [loading, setLoading] = useState(true);
@@ -136,6 +138,22 @@ export default function ConsulterArticles() {
   const handleClose = () => setOpen(false);
   const navigate = useNavigate();
 
+  const checkStatus = (status) => {
+    switch (status) {
+      case "Nouveau":
+        return "primary";
+
+      case "Disponible":
+        return "success";
+
+      case "Périmé":
+        return "danger";
+
+      case "Retiré":
+        return "warning";
+    }
+  };
+
   return (
     <>
       {loading ? (
@@ -204,54 +222,112 @@ export default function ConsulterArticles() {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {rows.map((row, id) => (
-                    <TableRow
-                      key={id}
-                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                    >
-                      <TableCell align="center">
-                        <img src={row.urlImage} width="100" height="60" />
-                      </TableCell>
-                      {/*<TableCell align="center">{row.id}</TableCell>*/}
-                      <TableCell align="center">{row.titreArticle}</TableCell>
-                      <TableCell align="center">{row.typeArticle}</TableCell>
-                      <TableCell align="center" bgcolor="#e3f2fd">
-                        {row.nomPointVente}
-                      </TableCell>
-                      <TableCell align="center">{row.nomCommercant}</TableCell>
-                      <TableCell align="center">{row.prixInitial}</TableCell>
-                      <TableCell align="center">{row.prixActuel}</TableCell>
-                      <TableCell align="center">{row.unite}</TableCell>
-                      <TableCell align="center" bgcolor="#e3f2fd">
-                        {row.quantite}
-                      </TableCell>
-                      <TableCell align="center">{row.datevalidite}</TableCell>
-                      <TableCell align="center">{row.dateretrait}</TableCell>
-                      <TableCell align="center" bgcolor="#e3f2fd">
-                        {row.statut}
-                      </TableCell>
-                      <TableCell align="center">{row.description}</TableCell>
-
-                      <TableCell align="center">
-                        <IconButton
-                          color="primary"
-                          onClick={(event) => {
-                            handleOpen(event, row.id);
-                          }}
-                          disabled={parseInt(row.quantite) === 0 ? false : true}
-                        >
-                          <DeleteIcon />
-                        </IconButton>
-                        <IconButton
-                          onClick={() => {
-                            navigate("/modifier/article/" + row.id);
-                          }}
-                        >
-                          <AutorenewIcon color="primary" />
-                        </IconButton>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  {rows.length == 0 ? (
+                    <>
+                      <TableRow
+                        sx={{
+                          "&:last-child td, &:last-child th": { border: 0 },
+                        }}
+                      >
+                        <TableCell align="center">
+                          <img src="/emptystock.png" width="100" height="60" />
+                        </TableCell>
+                        {/*<TableCell align="center">{row.id}</TableCell>*/}
+                        <TableCell align="center">
+                          {"row.titreArticle"}
+                        </TableCell>
+                        <TableCell align="center">
+                          {"row.typeArticle"}
+                        </TableCell>
+                        <TableCell align="center" bgcolor="#e3f2fd">
+                          {"nomPointVente"}
+                        </TableCell>
+                        <TableCell align="center">
+                          {"row.nomCommercant"}
+                        </TableCell>
+                        <TableCell align="center">
+                          {"row.prixInitial"}
+                        </TableCell>
+                        <TableCell align="center">{"row.prixActuel"}</TableCell>
+                        <TableCell align="center">{"row.unite"}</TableCell>
+                        <TableCell align="center" bgcolor="#e3f2fd">
+                          {"row.quantite"}
+                        </TableCell>
+                        <TableCell align="center">
+                          {"row.datevalidite"}
+                        </TableCell>
+                        <TableCell align="center">
+                          {"row.dateretrait"}
+                        </TableCell>
+                        <TableCell align="center" bgcolor="#e3f2fd">
+                          {"row.statut"}
+                        </TableCell>
+                        <TableCell align="center">
+                          {"row.description"}
+                        </TableCell>
+                        <TableCell align="center"></TableCell>
+                      </TableRow>
+                    </>
+                  ) : (
+                    rows.map((row, id) => (
+                      <TableRow
+                        key={id}
+                        sx={{
+                          "&:last-child td, &:last-child th": { border: 0 },
+                        }}
+                      >
+                        <TableCell align="center">
+                          <img src={row.urlImage} width="100" height="60" />
+                        </TableCell>
+                        {/*<TableCell align="center">{row.id}</TableCell>*/}
+                        <TableCell align="center">{row.titreArticle}</TableCell>
+                        <TableCell align="center">{row.typeArticle}</TableCell>
+                        <TableCell align="center" bgcolor="#e3f2fd">
+                          {row.nomPointVente}
+                        </TableCell>
+                        <TableCell align="center">
+                          {row.nomCommercant}
+                        </TableCell>
+                        <TableCell align="center">{row.prixInitial}</TableCell>
+                        <TableCell align="center">{row.prixActuel}</TableCell>
+                        <TableCell align="center">{row.unite}</TableCell>
+                        <TableCell align="center" bgcolor="#e3f2fd">
+                          {row.quantite}
+                        </TableCell>
+                        <TableCell align="center">{row.datevalidite}</TableCell>
+                        <TableCell align="center">{row.dateretrait}</TableCell>
+                        <TableCell align="center" bgcolor="#e3f2fd">
+                          <Badge
+                            badgeContent={row.statut}
+                            color={checkStatus(row.statut)}
+                          ></Badge>
+                        </TableCell>
+                        <TableCell align="center">{row.description}</TableCell>
+                        <TableCell align="center">
+                          <IconButton
+                            color="primary"
+                            onClick={(event) => {
+                              handleOpen(event, row.id);
+                            }}
+                            disabled={
+                              parseInt(row.quantite) === 0 ? false : true
+                            }
+                          >
+                            
+                            
+                            <DeleteIcon />
+                          </IconButton>
+                          <IconButton
+                            onClick={() => {
+                              navigate("/modifier/article/" + row.id);
+                            }}
+                          >
+                            <AutorenewIcon color="primary" />
+                          </IconButton>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
                 </TableBody>
               </Table>
             </TableContainer>

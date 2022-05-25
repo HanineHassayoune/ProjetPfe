@@ -1,42 +1,30 @@
 import * as React from "react";
-import Stack from "@mui/material/Stack";
-import Button from "@mui/material/Button";
-import Snackbar from "@mui/material/Snackbar";
-import MuiAlert from "@mui/material/Alert";
+import { styled } from "@mui/material/styles";
+import MuiGrid from "@mui/material/Grid";
+import Divider from "@mui/material/Divider";
+import Grid from "@mui/material/Grid";
+/*const Grid = styled(MuiGrid)(({ theme }) => ({
+  width: "100%",
+  ...theme.typography.body2,
+  '& [role="separator"]': {
+    margin: theme.spacing(0, 2),
+  },
+}));*/
 
-const Alert = React.forwardRef(function Alert(props, ref) {
-  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
-
-export default function CustomizedSnackbars() {
-  const [open, setOpen] = React.useState(false);
-
-  const handleClick = () => {
-    setOpen(true);
-  };
-
-  const handleClose = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-
-    setOpen(false);
-  };
-
+export default function VerticalDividerText() {
   return (
-    <Stack spacing={2} sx={{ width: "100%" }}>
-      <Button variant="outlined" onClick={handleClick}>
-        Open success snackbar
-      </Button>
-      <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
-        <Alert onClose={handleClose} severity="success" sx={{ width: "100%" }}>
-          This is a success message!
-        </Alert>
-      </Snackbar>
-      <Alert severity="error">This is an error message!</Alert>
-      <Alert severity="warning">This is a warning message!</Alert>
-      <Alert severity="info">This is an information message!</Alert>
-      <Alert severity="success">This is a success message!</Alert>
-    </Stack>
+    <Grid container>
+      <Grid item xs>
+        {`Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus id dignissim justo.
+   Nulla ut facilisis ligula. Interdum et malesuada fames ac ante ipsum primis in faucibus.
+   Sed malesuada lobortis pretium.`}
+      </Grid>
+
+      <Grid item xs>
+        {`Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus id dignissim justo.
+   Nulla ut facilisis ligula. Interdum et malesuada fames ac ante ipsum primis in faucibus.
+   Sed malesuada lobortis pretium.`}
+      </Grid>
+    </Grid>
   );
 }

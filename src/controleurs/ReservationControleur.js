@@ -3,7 +3,8 @@ import { db } from "../Helpers/FireBase";
 export function getReservationCurrentUser(currentUser) {
   var docRef = db
     .collection("Reservation")
-    .where("idCommercant", "==", currentUser);
+    .where("idCommercant", "==", currentUser)
+    .orderBy("dateReservation", "asc");
   return docRef.get();
 }
 export function updateReservation(data) {

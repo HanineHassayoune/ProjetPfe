@@ -42,7 +42,7 @@ export function getPointsVenteById(id) {
 
 export function updatePointsVente(data) {
   var docRef = db.collection("PointsDeVente");
-  return docRef.doc(data.id).update(data);
+  return docRef.doc(data.id).update(Object.assign({}, data));
 }
 export function setIdArticlesToPointVente(idPointVente, listIdArticles) {
   var docRef = db.collection("PointsDeVente").doc(idPointVente);

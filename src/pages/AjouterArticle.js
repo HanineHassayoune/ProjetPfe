@@ -29,10 +29,11 @@ import { CompteModel } from "../Models/CompteModel";
 import Stack from "@mui/material/Stack";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
+//
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
-const status = [
+/*const status = [
   {
     value: "Disponible",
     label: "Disponible",
@@ -49,7 +50,7 @@ const status = [
     value: "Perimé",
     label: "Perimé",
   },
-];
+];*/
 const Unite = [
   {
     value: "Kg",
@@ -106,7 +107,7 @@ const TypesArticle = [
 export default function Ajouter() {
   const regNum = new RegExp("^[0-9]+|[0-9]+[,|.][0-9]+$");
   const regNom = new RegExp("^[a-zA-Z]+ [a-zA-Z]+|[a-zA-Z]+$");
-  const [statutArticle, setStatutArticle] = useState("");
+  //const [statutArticle, setStatutArticle] = useState("");
   const [typeArticle, setTypeArticle] = useState("");
   const [uniteArticle, setUniteArticle] = useState("");
   const [ptv, setPtv] = useState({
@@ -162,7 +163,6 @@ export default function Ajouter() {
 
   useEffect(() => {
     console.log("use effect here");
-
     //get connected user
     getConnectedUser().then((_user) => {
       console.log("_user", _user);
@@ -194,7 +194,7 @@ export default function Ajouter() {
               value: elem.id,
               label: elem.titrePointVente,
             }));
-            _listPTV.unshift({ value: "", label: "----" });
+            _listPTV.unshift({ value: "", label: "-------------" });
             console.log("_listPTV", _listPTV);
             setListPTV(_listPTV);
 
@@ -567,8 +567,6 @@ export default function Ajouter() {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              //error
-                              // helperText="Your error message"
                               error={errors.datevalidite ? true : false}
                               helperText={errors.datevalidite}
                             />
@@ -577,18 +575,6 @@ export default function Ajouter() {
                       </LocalizationProvider>
                     </Grid>
                     <Grid item xs={12} sm={6}>
-                      {/*<TextField
-                        margin="normal"
-                        required
-                        fullWidth
-                        name="dateretrait"
-                        label="Date du retrait"
-                        type="dateretrait"
-                        id="dateretrait"
-                        autoComplete="dateretrait"
-                        error={errors.dateretrait ? true : false}
-                        helperText={errors.dateretrait}
-                        />*/}
                       <LocalizationProvider dateAdapter={AdapterDateFns}>
                         <DatePicker
                           label="Date du retrait"
@@ -599,8 +585,6 @@ export default function Ajouter() {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              //error
-                              //helperText="Your error message"
                               error={errors.dateretrait ? true : false}
                               helperText={errors.dateretrait}
                             />
