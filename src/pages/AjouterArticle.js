@@ -104,6 +104,7 @@ const TypesArticle = [
     label: "Produit laitier",
   },
 ];
+//
 export default function Ajouter() {
   const regNum = new RegExp("^[0-9]+|[0-9]+[,|.][0-9]+$");
   const regNom = new RegExp("^[a-zA-Z]+ [a-zA-Z]+|[a-zA-Z]+$");

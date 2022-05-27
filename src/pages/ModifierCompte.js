@@ -118,7 +118,7 @@ export default function ModifierCompte() {
     }
     setOpen(false);
   };
-
+  //
   // handleChange values of user
   const handleChange = (event) => {
     setUser({ ...user, [event.target.name]: event.target.value });

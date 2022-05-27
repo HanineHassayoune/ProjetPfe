@@ -7,3 +7,4 @@ function BarChart({ chartData }) {
 }
 
 export default BarChart;
+//

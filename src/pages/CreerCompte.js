@@ -15,7 +15,7 @@ import Link from "@mui/material/Link";
 import { register } from "../controleurs/CompteControleur";
 import { useNavigate } from "react-router-dom";
 const theme = createTheme();
-
+//
 export default function CreerCompte() {
   const regNom = new RegExp("^[a-zA-Z]+ [a-zA-Z]+|[a-zA-Z]+$");
   const pattern = new RegExp("^[a-zA-Z0-9]+@[a-zA-Z0-9]+.[A-Za-z]+$");
@@ -28,10 +28,7 @@ export default function CreerCompte() {
     password: "",
   });
   const [form, setForm] = useState({
-    nom: "",
-    prenom: "",
     email: "",
-    numerotlf: "",
     password: "",
   });
   const navigate = useNavigate();
@@ -45,9 +42,9 @@ export default function CreerCompte() {
     } else _errors.nom = "";
     //verifier prenom
     if (!data.prenom) {
-      _errors.prenom = "Le prenom est obligatoire";
+      _errors.prenom = "Le prénom est obligatoire";
     } else if (!regNom.test(data.prenom)) {
-      _errors.prenom = "Le prenom doit contenir seulement des lettres";
+      _errors.prenom = "Le prénom doit contenir seulement des lettres";
     } else _errors.prenom = "";
     //verifier email
     if (!data.email) {
@@ -57,17 +54,17 @@ export default function CreerCompte() {
     } else _errors.email = "";
     //verifier numero telephone
     if (!data.numerotlf) {
-      _errors.numerotlf = "Le numero téléphone est obligatoire";
+      _errors.numerotlf = "Le numéro téléphone est obligatoire";
     } else if (!regNum.test(data.numerotlf)) {
       _errors.numerotlf =
-        "Le numero téléphone doit contenir seulement des chiffres";
+        "Le numéro téléphone doit contenir seulement des chiffres";
     } else if (data.numerotlf.length != 8) {
-      _errors.numerotlf = "Le numero téléphone doit contenir 8 chiffres";
+      _errors.numerotlf = "Le numéro téléphone doit contenir 8 chiffres";
     } else _errors.numerotlf = "";
     //verifier password
-    /* if (!data.password) {
+    if (!data.password) {
       _errors.password = "Le mots de passe est obligatoire";
-    } else _errors.password = "";*/
+    } else _errors.password = "";
     //set errors
     setErrors(_errors);
     if (Object.values(_errors).filter((item) => item).length === 0) {
@@ -190,9 +187,9 @@ export default function CreerCompte() {
                 label="Mots de passe"
                 type="password"
                 id="password"
-                // error={errors.password ? true : false}
+                //error={errors.password ? true : false}
                 //helperText={errors.password}
-                // autoComplete="current-password"
+                //autoComplete="current-password"
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
               />
 

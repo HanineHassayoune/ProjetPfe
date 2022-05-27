@@ -38,7 +38,7 @@ export default function ModifierPointVente() {
 
   const regNom = new RegExp("^[a-zA-Z]+ [a-zA-Z]+|[a-zA-Z]+$");
   const regNum = new RegExp("^[0-9]+.[0-9]+|[0-9\b]+$");
-
+  //
   const navigate = useNavigate();
   const [data, setData] = useState({
     titrePointVente: "",

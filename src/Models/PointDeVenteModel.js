@@ -23,3 +23,4 @@ export class PointDeVenteModel {
     this.urlImagePtv = urlImagePtv;
   }
 }
+//

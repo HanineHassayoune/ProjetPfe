@@ -146,8 +146,8 @@ export default function ConsulterArticles() {
       case "Disponible":
         return "success";
 
-      case "Périmé":
-        return "danger";
+      case "Perimé":
+        return "error";
 
       case "Retiré":
         return "warning";
@@ -176,9 +176,6 @@ export default function ConsulterArticles() {
                     <TableCell align="center" bgcolor="#e3f2fd">
                       Image article
                     </TableCell>
-                    {/*<TableCell align="center" bgcolor="#e3f2fd">
-                      Id article
-                   </TableCell>*/}
                     <TableCell align="center" bgcolor="#e3f2fd">
                       Titre article
                     </TableCell>
@@ -232,40 +229,22 @@ export default function ConsulterArticles() {
                         <TableCell align="center">
                           <img src="/emptystock.png" width="100" height="60" />
                         </TableCell>
-                        {/*<TableCell align="center">{row.id}</TableCell>*/}
+                        <TableCell align="center">{"Pas de données"}</TableCell>
+                        <TableCell align="center">{"Pas de données"}</TableCell>
+                        <TableCell align="center">{"Pas de données"}</TableCell>
+                        <TableCell align="center">{"Pas de données"}</TableCell>
+                        <TableCell align="center">{"Pas de données"}</TableCell>
+                        <TableCell align="center">{"Pas de données"}</TableCell>
+                        <TableCell align="center">{"Pas de données"}</TableCell>
+                        <TableCell align="center">{"Pas de données"}</TableCell>
+                        <TableCell align="center">{"Pas de données"}</TableCell>
+                        <TableCell align="center">{"Pas de données"}</TableCell>
+                        <TableCell align="center">{"Pas de données"}</TableCell>
+                        <TableCell align="center">{"Pas de données"}</TableCell>
                         <TableCell align="center">
-                          {"row.titreArticle"}
+                          <DeleteIcon color="disabled" />
+                          <AutorenewIcon color="disabled" />
                         </TableCell>
-                        <TableCell align="center">
-                          {"row.typeArticle"}
-                        </TableCell>
-                        <TableCell align="center" bgcolor="#e3f2fd">
-                          {"nomPointVente"}
-                        </TableCell>
-                        <TableCell align="center">
-                          {"row.nomCommercant"}
-                        </TableCell>
-                        <TableCell align="center">
-                          {"row.prixInitial"}
-                        </TableCell>
-                        <TableCell align="center">{"row.prixActuel"}</TableCell>
-                        <TableCell align="center">{"row.unite"}</TableCell>
-                        <TableCell align="center" bgcolor="#e3f2fd">
-                          {"row.quantite"}
-                        </TableCell>
-                        <TableCell align="center">
-                          {"row.datevalidite"}
-                        </TableCell>
-                        <TableCell align="center">
-                          {"row.dateretrait"}
-                        </TableCell>
-                        <TableCell align="center" bgcolor="#e3f2fd">
-                          {"row.statut"}
-                        </TableCell>
-                        <TableCell align="center">
-                          {"row.description"}
-                        </TableCell>
-                        <TableCell align="center"></TableCell>
                       </TableRow>
                     </>
                   ) : (
@@ -279,7 +258,6 @@ export default function ConsulterArticles() {
                         <TableCell align="center">
                           <img src={row.urlImage} width="100" height="60" />
                         </TableCell>
-                        {/*<TableCell align="center">{row.id}</TableCell>*/}
                         <TableCell align="center">{row.titreArticle}</TableCell>
                         <TableCell align="center">{row.typeArticle}</TableCell>
                         <TableCell align="center" bgcolor="#e3f2fd">
@@ -313,8 +291,6 @@ export default function ConsulterArticles() {
                               parseInt(row.quantite) === 0 ? false : true
                             }
                           >
-                            
-                            
                             <DeleteIcon />
                           </IconButton>
                           <IconButton

@@ -1,21 +1,9 @@
 import React from "react";
-//import Paper from "@material-ui/core/Paper";
 import Paper from "@mui/material/Paper";
 import BarChart from "./BarChart";
 import LineChart from "./LineChart";
 import PieChart from "./PieChart";
-import { UserData } from "./Data";
-import {
-  Chart,
-  PieSeries,
-  Title,
-} from "@devexpress/dx-react-chart-material-ui";
-import {
-  ArgumentAxis,
-  ValueAxis,
-  BarSeries,
-} from "@devexpress/dx-react-chart-material-ui";
-import { Grid } from "@mui/material";
+import { Card, Grid } from "@mui/material";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -37,10 +25,20 @@ import { updateReservation } from "../controleurs/ReservationControleur";
 import { Button } from "@mui/material";
 import { getConnectedUser } from "../Helpers/FireBase";
 import { consulterListeArticlesCurrentUser } from "../controleurs/ArticleControleurs";
+import ListItemAvatar from "@mui/material/ListItemAvatar";
+import ListItemText from "@mui/material/ListItemText";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import { Avatar } from "@mui/material";
+import { getCommentairesCurrentUser } from "../controleurs/CommentaireControleur";
+import SentimentDissatisfiedIcon from "@mui/icons-material/SentimentDissatisfied";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import InsertEmoticonIcon from "@mui/icons-material/InsertEmoticon";
 const Statistique = () => {
   const [rows, setRows] = useState([]);
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [commentaires, setCommentaires] = useState([]);
 
   console.log("rowssssssssssssssssss", rows);
   //change statut d'article et quantité restante
@@ -107,6 +105,24 @@ const Statistique = () => {
       },
     ],
   });
+  const [degreData, setDegreData] = useState({
+    labels: [],
+    datasets: [
+      {
+        label: "",
+        data: [],
+        backgroundColor: [
+          "rgba(75,192,192,1)",
+          "#ecf0f1",
+          "#50AF95",
+          "#f3ba2f",
+          "#2a71d0",
+        ],
+        borderColor: "black",
+        borderWidth: 2,
+      },
+    ],
+  });
 
   //Cercle : quantité d'article par chaque type
   const [cercleData, setCercleData] = useState({
@@ -127,6 +143,19 @@ const Statistique = () => {
       },
     ],
   });
+
+  const checkDegre = (_degre) => {
+    switch (_degre) {
+      case "2":
+        return <FavoriteBorderIcon sx={{ color: "red" }} />;
+
+      case "1":
+        return <InsertEmoticonIcon sx={{ color: "green" }} />;
+
+      case "0":
+        return <SentimentDissatisfiedIcon sx={{ color: "blue" }} />;
+    }
+  };
 
   useEffect(() => {
     console.log("use effect here ");
@@ -217,6 +246,7 @@ const Statistique = () => {
                               "#50AF95",
                               "#f3ba2f",
                               "#2a71d0",
+                              "#757e8",
                             ],
                             borderColor: "black",
                             borderWidth: 2,
@@ -253,11 +283,41 @@ const Statistique = () => {
                     "#50AF95",
                     "#f3ba2f",
                     "#2a71d0",
+                    "#002984",
                   ],
                   borderColor: "black",
                   borderWidth: 2,
                 },
               ],
+            });
+            getCommentairesCurrentUser(_user.uid).then((_commentaires) => {
+              let values = _commentaires.docs.map((doc) => doc.data());
+              console.log("commentaires", values);
+              setCommentaires(values);
+              const DataSatistaction = values.map((elem) => ({
+                nomPtv: elem.titrePointVente,
+                degre: parseInt(elem.degreDeSatisfaction),
+              }));
+              console.log("DataSatistaction", DataSatistaction);
+              setDegreData({
+                labels: DataSatistaction.map((data) => data.nomPtv),
+                datasets: [
+                  {
+                    label: "Degré de satisfaction pour chaque client",
+                    data: DataSatistaction.map((data) => data.degre),
+                    backgroundColor: [
+                      "rgba(75,192,192,1)",
+                      "#ecf0f1",
+                      "#50AF95",
+                      "#f3ba2f",
+                      "#2a71d0",
+                      "#002984",
+                    ],
+                    borderColor: "black",
+                    borderWidth: 2,
+                  },
+                ],
+              });
             });
           })
           .catch((error) => {
@@ -283,19 +343,15 @@ const Statistique = () => {
         <>
           <Grid
             container
-            spacing={2}
+            spacing={4}
             justifyContent="center"
             alignItems="center"
           >
-            {/* Les batons*/}
-            <Grid item xs={12} sm={6}>
-              <BarChart chartData={userData} />
+            <Grid item xs={12}>
+              <Typography variant="h5" color="#002984">
+                1-Tableau des réservations pour chaque client :
+              </Typography>
             </Grid>
-            {/* courbe*/}
-            <Grid item xs={12} sm={6}>
-              <LineChart chartData={cercleData} />
-            </Grid>
-
             <Grid item xs={12}>
               <TableContainer component={Paper}>
                 <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -323,9 +379,6 @@ const Statistique = () => {
                       <TableCell align="center" bgcolor="#e3f2fd">
                         Date réservation
                       </TableCell>
-                      {/*<TableCell align="center" bgcolor="#e3f2fd">
-                        Id réservation
-                      </TableCell>*/}
                       <TableCell align="center" bgcolor="#e3f2fd">
                         Action
                       </TableCell>
@@ -333,56 +386,189 @@ const Statistique = () => {
                   </TableHead>
 
                   <TableBody>
-                    {rows.map((row, id) => (
-                      <TableRow
-                        key={id}
-                        sx={{
-                          "&:last-child td, &:last-child th": { border: 0 },
-                        }}
-                      >
-                        <TableCell align="center">{row.emailClient}</TableCell>
-                        <TableCell align="center">{row.titreArticle}</TableCell>
-                        <TableCell align="center">
-                          {row.quantiteArticle}
-                        </TableCell>
-                        <TableCell align="center">
-                          {row.quantiteReserve}
-                        </TableCell>
-                        <TableCell align="center">
-                          {row.titrePointVente}
-                        </TableCell>
-                        <TableCell align="center">
-                          {row.statutReservation}
-                        </TableCell>
-                        <TableCell align="center">
-                          {row.dateReservation}
-                        </TableCell>
-                        {/*<TableCell align="center">
-                          {row.idReservation}
-                      </TableCell>*/}
-                        <TableCell align="center">
-                          <Button
-                            variant="contained"
-                            onClick={(event) => {
-                              handleChange(event, row);
+                    {rows.length == 0 ? (
+                      <>
+                        <TableRow
+                          sx={{
+                            "&:last-child td, &:last-child th": { border: 0 },
+                          }}
+                        >
+                          <TableCell align="center">
+                            <img
+                              src="/emptystock.png"
+                              width="100"
+                              height="60"
+                            />
+                          </TableCell>
+                          <TableCell align="center">
+                            {"Pas de données"}
+                          </TableCell>
+                          <TableCell align="center">
+                            {"Pas de données"}
+                          </TableCell>
+                          <TableCell align="center">
+                            {"Pas de données"}
+                          </TableCell>
+                          <TableCell align="center">
+                            {"Pas de données"}
+                          </TableCell>
+                          <TableCell align="center">
+                            {"Pas de données"}
+                          </TableCell>
+                          <TableCell align="center">
+                            {"Pas de données"}
+                          </TableCell>
+                          <TableCell align="center">
+                            <Button variant="contained" disabled>
+                              {" "}
+                              Retirer
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      </>
+                    ) : (
+                      <>
+                        {rows.map((row, id) => (
+                          <TableRow
+                            key={id}
+                            sx={{
+                              "&:last-child td, &:last-child th": { border: 0 },
                             }}
-                            disabled={
-                              parseInt(row.quantiteArticle) > 0 ? false : true
-                            }
                           >
-                            Retirer
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                            <TableCell align="center">
+                              {row.emailClient}
+                            </TableCell>
+                            <TableCell align="center">
+                              {row.titreArticle}
+                            </TableCell>
+                            <TableCell align="center">
+                              {row.quantiteArticle}
+                            </TableCell>
+                            <TableCell align="center">
+                              {row.quantiteReserve}
+                            </TableCell>
+                            <TableCell align="center">
+                              {row.titrePointVente}
+                            </TableCell>
+                            <TableCell align="center">
+                              {row.statutReservation}
+                            </TableCell>
+                            <TableCell align="center">
+                              {row.dateReservation}
+                            </TableCell>
+                            <TableCell align="center">
+                              <Button
+                                variant="contained"
+                                onClick={(event) => {
+                                  handleChange(event, row);
+                                }}
+                                disabled={
+                                  parseInt(row.quantiteArticle) > 0
+                                    ? false
+                                    : true
+                                }
+                              >
+                                Retirer
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </>
+                    )}
                   </TableBody>
                 </Table>
               </TableContainer>
             </Grid>
             {/* Cercle*/}
-            <Grid item xs={12}>
-              <div style={{ width: 500 }}>
+            <Grid item xs={12} sm={6}>
+              <Typography variant="h6" color="#002984">
+                2-Diagramme circulaire : réprésente la quantité de chaque
+                article par type .
+              </Typography>
+              <div style={{ width: 400 }}>
                 <PieChart chartData={cercleData} />
+              </div>
+            </Grid>
+            {/* Les batons*/}
+            <Grid item xs={12} sm={6}>
+              <div style={{ width: 600 }}>
+                <BarChart chartData={userData} />
+              </div>
+              <Typography variant="h6" color="#002984">
+                3-Diagramme en bâtons : répresente la quantité réservée par
+                chaque client en fonction du date .
+              </Typography>
+            </Grid>
+
+            <Grid item xs={12}>
+              <Typography variant="h6" color="#002984">
+                4-Tableau des commentaires pour chaque client :
+              </Typography>
+              <Paper square sx={{ pb: "50px" }} elevation={5}>
+                <Typography
+                  color="#002984"
+                  variant="h4"
+                  gutterBottom
+                  component="div"
+                  sx={{ p: 2, pb: 0 }}
+                >
+                  Commentaires des clients :
+                </Typography>
+                {commentaires.length == 0 ? (
+                  <>
+                    <Typography align="center" variant="h6">
+                      <SentimentDissatisfiedIcon />
+                      Pas de commentaires
+                    </Typography>
+                  </>
+                ) : (
+                  <>
+                    <List sx={{ mb: 2 }}>
+                      {commentaires.map(
+                        ({
+                          idCommentaire,
+                          emailClient,
+                          commentaire,
+                          titrePointVente,
+                          degreDeSatisfaction,
+                        }) => (
+                          <React.Fragment key={idCommentaire}>
+                            <ListItem>
+                              <ListItemAvatar>
+                                <Avatar sx={{ bgcolor: "primary.main" }}>
+                                  {emailClient.charAt(0)}
+                                </Avatar>
+                              </ListItemAvatar>
+                              <ListItemText
+                                primary={emailClient}
+                                secondary={commentaire}
+                              />
+                              <ListItemText
+                                secondary={checkDegre(degreDeSatisfaction)}
+                              />
+                              <Typography
+                                variant="h5"
+                                color="#9c27b0
+"
+                              >
+                                {titrePointVente}
+                              </Typography>
+                            </ListItem>
+                          </React.Fragment>
+                        )
+                      )}
+                    </List>
+                  </>
+                )}
+              </Paper>
+            </Grid>
+            <Grid item xs={12} color="#002984">
+              <Typography variant="h6">
+                5-Courbe : répresente la satisfaction des clients d'après les
+                commentaires .
+              </Typography>
+              <div style={{ width: 800 }}>
+                <LineChart chartData={degreData} />
               </div>
             </Grid>
           </Grid>

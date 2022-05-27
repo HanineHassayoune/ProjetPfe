@@ -36,7 +36,7 @@ function intersection(a, b) {
 function union(a, b) {
   return [...a, ...not(b, a)];
 }
-
+//
 export default function TransferList() {
   let { id } = useParams();
   const [article, setArticle] = useState([]);

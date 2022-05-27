@@ -35,6 +35,3 @@ export class ArticleModel {
     this.description = description;
   }
 }
-//id point de vente
-//nom ptv
-//id commercant

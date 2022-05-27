@@ -72,6 +72,7 @@ export function getListArticlesFromPtvByListId(listIdArticles) {
       let LeftList = snapshot.docs.map((doc) => doc.data());
       return LeftList;
     });
+  //
   // var docRef = db.collection("Articles").where("id", "in", listIdArticles);
   // return docRef.get();
 }

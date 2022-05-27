@@ -5,5 +5,5 @@ import { Chart as ChartJS } from "chart.js/auto";
 function PieChart({ chartData }) {
   return <Pie data={chartData} />;
 }
-
+//
 export default PieChart;

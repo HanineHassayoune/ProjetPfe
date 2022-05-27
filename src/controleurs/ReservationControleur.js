@@ -10,6 +10,7 @@ export function getReservationCurrentUser(currentUser) {
 export function updateReservation(data) {
   var docRef = db.collection("Reservation");
   return docRef.doc(data.reserverId).update(data);
+  //
 }
 
 export function deleteReservation(reservation) {

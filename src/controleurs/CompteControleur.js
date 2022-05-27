@@ -48,7 +48,7 @@ export const login = async ({ email, password }) => {
   const res = await firebase.auth().signInWithEmailAndPassword(email, password);
   return res.user;
 };
-
+//
 export function updateCompte(data) {
   var docRef = db.collection("Comptes");
   return docRef.doc(data.id).update(Object.assign({}, data));

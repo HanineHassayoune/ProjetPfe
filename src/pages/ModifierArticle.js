@@ -100,6 +100,7 @@ const TypesArticle = [
     label: "Produit laitier",
   },
 ];
+//
 export default function ModifierArticle() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);

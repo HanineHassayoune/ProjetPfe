@@ -29,6 +29,10 @@ import AddBusinessIcon from "@mui/icons-material/AddBusiness";
 import LogoutIcon from "@mui/icons-material/Logout";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { Deconnexion } from "../controleurs/CompteControleur";
+import ContactPageIcon from "@mui/icons-material/ContactPage";
+import Button from "@mui/material/Button";
+import Badge from "@mui/material/Badge";
+import NotificationsIcon from "@mui/icons-material/Notifications";
 
 const drawerWidth = 240;
 
@@ -114,9 +118,27 @@ export default function Menu({ children }) {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap component="div">
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             anti-gaspi
           </Typography>
+          <IconButton
+            size="large"
+            aria-label="show 17 new notifications"
+            color="inherit"
+          >
+            <Badge badgeContent={1} color="error">
+              <NotificationsIcon />
+            </Badge>
+          </IconButton>
+          <IconButton
+            size="large"
+            color="inherit"
+            onClick={() => {
+              Deconnexion(navigate("/"));
+            }}
+          >
+            <LogoutIcon />
+          </IconButton>
         </Toolbar>
       </AppBar>
       <Drawer
@@ -143,13 +165,6 @@ export default function Menu({ children }) {
         </DrawerHeader>
         <Divider />
         <List>
-          {/*<ListItem button onClick={()=>{navigate('/calendrier')}}>
-              <ListItemIcon>
-                <CalendarMonthIcon color="primary"/>
-              </ListItemIcon>
-              <ListItemText primary={'Calendrier'} />
-      </ListItem>*/}
-
           <ListItem
             button
             onClick={() => {
@@ -248,6 +263,17 @@ export default function Menu({ children }) {
         </List>
 
         <Divider />
+        <ListItem
+          button
+          onClick={() => {
+            navigate("/contacts");
+          }}
+        >
+          <ListItemIcon>
+            <ContactPageIcon color="primary" />
+          </ListItemIcon>
+          <ListItemText primary={"Contacts"} />
+        </ListItem>
 
         <ListItem
           button

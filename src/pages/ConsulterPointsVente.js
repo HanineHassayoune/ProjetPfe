@@ -83,9 +83,6 @@ export default function ConsulterPointsVente() {
               <TableCell align="center" bgcolor="#e3f2fd">
                 Image point vente
               </TableCell>
-              {/*<TableCell align="center" bgcolor="#e3f2fd">
-                Id point vente
-  </TableCell>*/}
               <TableCell align="center" bgcolor="#e3f2fd">
                 Titre point vente
               </TableCell>
@@ -104,45 +101,70 @@ export default function ConsulterPointsVente() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((row, id) => (
-              <TableRow
-                key={id}
-                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-              >
-                <TableCell align="center">
-                  <img src={row.urlImagePtv} width="120" height="70" />
-                </TableCell>
-                {/*<TableCell align="center">{row.id}</TableCell>*/}
-                <TableCell align="center">{row.titrePointVente}</TableCell>
-                <TableCell align="center">{row.adressePointVente}</TableCell>
-                <TableCell align="center">{row.email}</TableCell>
-                <TableCell align="center">{row.numerotlf}</TableCell>
+            {rows.length == 0 ? (
+              <>
+                <TableRow
+                  sx={{
+                    "&:last-child td, &:last-child th": { border: 0 },
+                  }}
+                >
+                  <TableCell align="center">
+                    <img src="/emptystock.png" width="100" height="60" />
+                  </TableCell>
+                  <TableCell align="center">{"Pas de données"}</TableCell>
+                  <TableCell align="center">{"Pas de données"}</TableCell>
+                  <TableCell align="center">{"Pas de données"}</TableCell>
+                  <TableCell align="center">{"Pas de données"}</TableCell>
+                  <TableCell align="center">
+                    <FindInPageIcon color="disabled" />
+                    <AutorenewIcon color="disabled" />
+                  </TableCell>
+                </TableRow>
+              </>
+            ) : (
+              <>
+                {rows.map((row, id) => (
+                  <TableRow
+                    key={id}
+                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                  >
+                    <TableCell align="center">
+                      <img src={row.urlImagePtv} width="120" height="70" />
+                    </TableCell>
+                    <TableCell align="center">{row.titrePointVente}</TableCell>
+                    <TableCell align="center">
+                      {row.adressePointVente}
+                    </TableCell>
+                    <TableCell align="center">{row.email}</TableCell>
+                    <TableCell align="center">{row.numerotlf}</TableCell>
 
-                <TableCell align="center">
-                  {/*<IconButton
+                    <TableCell align="center">
+                      {/*<IconButton
                     onClick={(event) => {
                       handleOpen(event, row.id);
                     }}
                   >
                     <DeleteIcon color="primary" />
                   </IconButton>*/}
-                  <IconButton
-                    onClick={() => {
-                      navigate("/modifier/pointvente/" + row.id);
-                    }}
-                  >
-                    <AutorenewIcon color="primary" />
-                  </IconButton>
-                  <IconButton
-                    onClick={() => {
-                      navigate("/detail/" + row.id);
-                    }}
-                  >
-                    <FindInPageIcon color="primary" />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
+                      <IconButton
+                        onClick={() => {
+                          navigate("/modifier/pointvente/" + row.id);
+                        }}
+                      >
+                        <AutorenewIcon color="primary" />
+                      </IconButton>
+                      <IconButton
+                        onClick={() => {
+                          navigate("/detail/" + row.id);
+                        }}
+                      >
+                        <FindInPageIcon color="primary" />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </>
+            )}
           </TableBody>
         </Table>
       </TableContainer>
