@@ -108,7 +108,7 @@ export default function MdpOublie() {
                 variant="contained"
                 sx={{ mt: 3, mb: 2 }}
               >
-                Rechercher
+                Modifier
               </Button>
               <Link href="/" variant="body2">
                 Connexion

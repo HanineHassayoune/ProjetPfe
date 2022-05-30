@@ -32,8 +32,10 @@ import ListItem from "@mui/material/ListItem";
 import { Avatar } from "@mui/material";
 import { getCommentairesCurrentUser } from "../controleurs/CommentaireControleur";
 import SentimentDissatisfiedIcon from "@mui/icons-material/SentimentDissatisfied";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import SentimentSatisfiedAltIcon from "@mui/icons-material/SentimentSatisfiedAlt";
 import InsertEmoticonIcon from "@mui/icons-material/InsertEmoticon";
+import SentimentVeryDissatisfiedIcon from "@mui/icons-material/SentimentVeryDissatisfied";
+import SentimentVerySatisfiedIcon from "@mui/icons-material/SentimentVerySatisfied";
 const Statistique = () => {
   const [rows, setRows] = useState([]);
   const [articles, setArticles] = useState([]);
@@ -146,14 +148,14 @@ const Statistique = () => {
 
   const checkDegre = (_degre) => {
     switch (_degre) {
+      case "3":
+        return <SentimentVerySatisfiedIcon sx={{ color: "red" }} />;
+
       case "2":
-        return <FavoriteBorderIcon sx={{ color: "red" }} />;
+        return <SentimentSatisfiedAltIcon sx={{ color: "green" }} />;
 
       case "1":
-        return <InsertEmoticonIcon sx={{ color: "green" }} />;
-
-      case "0":
-        return <SentimentDissatisfiedIcon sx={{ color: "blue" }} />;
+        return <SentimentVeryDissatisfiedIcon sx={{ color: "blue" }} />;
     }
   };
 
@@ -234,6 +236,7 @@ const Statistique = () => {
                         quantite: elem.quantiteReserve,
                       }));
                       console.log(Data);
+                      //trasage de la courbe des reservations en fonction des dates
                       setUserData({
                         labels: Data.map((data) => data.date),
                         datasets: [
@@ -260,19 +263,36 @@ const Statistique = () => {
             }
           );
         });
+        //tracage du cercle : les types des articles en fonction des quantités
         consulterListeArticlesCurrentUser(_user.uid)
           .then((articles) => {
-            let values = articles.docs.map((doc) => doc.data());
-            console.log("values", values);
-            setArticles(values);
-            const DataType = values.map((elem) => ({
-              id: elem.id,
-              type: elem.typeArticle,
-              quantite: parseInt(elem.quantite),
-            }));
+            let valuesDesArticles = articles.docs.map((doc) => doc.data());
+            console.log("valuesDesArticles", valuesDesArticles);
+            setArticles(valuesDesArticles);
+            let ListDesIdArticles = articles.docs.map(
+              (doc) => doc.data().typeArticle
+            );
+            let newList = [...new Set(ListDesIdArticles)];
+            console.log(" newList sans redandance", newList);
+            let DataType = [];
+            newList.map((element) => {
+              let cercleObject = {
+                typeArticle: "",
+                quantite: 0,
+              };
+              valuesDesArticles.map((currentElement) => {
+                if (element == currentElement.typeArticle) {
+                  cercleObject.quantite =
+                    cercleObject.quantite + parseInt(currentElement.quantite);
+                  cercleObject.typeArticle = currentElement.typeArticle;
+                }
+              });
+              DataType.push(cercleObject);
+            });
             console.log("DataType", DataType);
+
             setCercleData({
-              labels: DataType.map((data) => data.type),
+              labels: DataType.map((data) => data.typeArticle),
               datasets: [
                 {
                   label: "Type d'article par quantité",
@@ -290,33 +310,87 @@ const Statistique = () => {
                 },
               ],
             });
+            // trasage du courbe des degres de satisfaction pour chaque point de vente
             getCommentairesCurrentUser(_user.uid).then((_commentaires) => {
+              // test contient la  liste des commentaires filter idPtv
+              let test = _commentaires.docs.map(
+                (element) => element.data().idPtv
+              );
+              console.log("***test***", test);
+              let newTest = [...new Set(test)];
+              console.log("***newTest***", newTest);
+
+              //get liste des commentaires
               let values = _commentaires.docs.map((doc) => doc.data());
+              console.log("values des commentaires", values);
+              let cleanStat = [];
+              newTest.map((currentElement) => {
+                let objectStat = {
+                  titre: "",
+                  satisfait: 0,
+                  pasSatisfait: 0,
+                  tresSatisfait: 0,
+                };
+                // else ???
+                values.map((element) => {
+                  if (element.idPtv == currentElement) {
+                    objectStat.titre = element.titrePointVente;
+                    if (element.degreDeSatisfaction === "3") {
+                      objectStat.tresSatisfait += 1;
+                    } else if (element.degreDeSatisfaction === "2") {
+                      objectStat.satisfait += 1;
+                    } else if (element.degreDeSatisfaction === "1")
+                      objectStat.pasSatisfait += 1;
+                  }
+                });
+                cleanStat.push(objectStat);
+                console.log("***cleanStat***", cleanStat);
+              });
+              let fullDataSet = [];
+              cleanStat.map((element) => {
+                let dataSet = {
+                  label: "Degré de satisfaction pour" + " " + element.titre,
+                  data: [
+                    element.satisfait,
+                    element.tresSatisfait,
+                    element.pasSatisfait,
+                  ],
+                  backgroundColor: [
+                    "rgba(75,192,192,1)",
+                    "#ecf0f1",
+                    "#50AF95",
+                    "#f3ba2f",
+                    "#2a71d0",
+                    "#002984",
+                  ],
+                  borderColor: "black",
+                  borderWidth: 2,
+                };
+                //array contient tous les data ===> tous les ligne qui seront afficher dans la courbe
+                fullDataSet.push(dataSet);
+                console.log("***fullDataSet***", fullDataSet);
+              });
+              console.log("hassayoune", cleanStat);
+              // begin stats
+
+              setDegreData({
+                labels: ["Satisfait", "Trés satisfait", "Pas satisfait"],
+                datasets: fullDataSet,
+              });
+
+              //end stats
+              console.log("ID ptv", test);
+
               console.log("commentaires", values);
               setCommentaires(values);
-              const DataSatistaction = values.map((elem) => ({
-                nomPtv: elem.titrePointVente,
-                degre: parseInt(elem.degreDeSatisfaction),
-              }));
-              console.log("DataSatistaction", DataSatistaction);
+              let degreSatisfaction = _commentaires.docs.map(
+                (doc) => doc.data().degreDeSatisfaction
+              );
+              console.log("degreSatisfaction", degreSatisfaction);
+
               setDegreData({
-                labels: DataSatistaction.map((data) => data.nomPtv),
-                datasets: [
-                  {
-                    label: "Degré de satisfaction pour chaque client",
-                    data: DataSatistaction.map((data) => data.degre),
-                    backgroundColor: [
-                      "rgba(75,192,192,1)",
-                      "#ecf0f1",
-                      "#50AF95",
-                      "#f3ba2f",
-                      "#2a71d0",
-                      "#002984",
-                    ],
-                    borderColor: "black",
-                    borderWidth: 2,
-                  },
-                ],
+                labels: ["Satisfait", "Trés satisfait", "Pas satisfait"],
+                datasets: fullDataSet,
               });
             });
           })
@@ -512,13 +586,13 @@ const Statistique = () => {
                   component="div"
                   sx={{ p: 2, pb: 0 }}
                 >
-                  Commentaires des clients :
+                  Avis des clients :
                 </Typography>
                 {commentaires.length == 0 ? (
                   <>
                     <Typography align="center" variant="h6">
                       <SentimentDissatisfiedIcon />
-                      Pas de commentaires
+                      Pas d'avis
                     </Typography>
                   </>
                 ) : (
@@ -564,11 +638,12 @@ const Statistique = () => {
             </Grid>
             <Grid item xs={12} color="#002984">
               <Typography variant="h6">
-                5-Courbe : répresente la satisfaction des clients d'après les
-                commentaires .
+                5-Courbe : répresente la satisfaction des clients par chaque
+                point de vente .
               </Typography>
-              <div style={{ width: 800 }}>
-                <LineChart chartData={degreData} />
+              <div style={{ width: 1000 }}>
+                {/*<LineChart chartData={degreData} />*/}
+                <BarChart chartData={degreData} />
               </div>
             </Grid>
           </Grid>

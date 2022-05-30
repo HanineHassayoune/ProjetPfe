@@ -12,11 +12,12 @@ import AutorenewIcon from "@mui/icons-material/Autorenew";
 import IconButton from "@mui/material/IconButton";
 import { useNavigate } from "react-router-dom";
 import Modal from "@mui/material/Modal";
-import { Box, makeStyles, Typography } from "@mui/material";
+import { Box, makeStyles, Pagination, Typography } from "@mui/material";
 import Button from "@mui/material/Button";
 import CancelIcon from "@mui/icons-material/Cancel";
 import ReportProblemIcon from "@mui/icons-material/ReportProblem";
 import { consulterListeArticlesCurrentUser } from "../controleurs/ArticleControleurs";
+import TablePagination from "@mui/material/TablePagination";
 import Badge from "@mui/material/Badge";
 import {
   deleteArticle,

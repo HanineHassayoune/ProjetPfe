@@ -77,9 +77,16 @@ export default function Connexion() {
 
     //connexion after validation form
     if (isFormValid(dataValues)) {
-      let user = await login(form);
+      let user = await login(form)
+        .then((test) => console.log("test", test))
+        .catch((error) => {
+          console.log("error", error);
+          if (error.code == "auth/user-not-found") {
+            handleClickError();
+          }
+        });
       console.log("user", user);
-      console.log(" user.id", user.uid);
+
       let _user = await getUserById(user.uid);
       console.log("Hello connected user", _user.data().type.toUpperCase());
       if (_user.exists && _user.data().type.toUpperCase() == "COMMERCANT") {

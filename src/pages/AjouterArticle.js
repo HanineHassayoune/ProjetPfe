@@ -546,18 +546,6 @@ export default function Ajouter() {
                       />
                     </Grid>
                     <Grid item xs={12} sm={6}>
-                      {/*<TextField
-                        margin="normal"
-                        required
-                        fullWidth
-                        name="datevalidite"
-                        label="Date de validité"
-                        type="datevalidite"
-                        id="datevalidite"
-                        autoComplete="datevalidite"
-                        error={errors.datevalidite ? true : false}
-                        helperText={errors.datevalidite}
-                      />*/}
                       <LocalizationProvider dateAdapter={AdapterDateFns}>
                         <DatePicker
                           label="Date de validité"
@@ -593,29 +581,7 @@ export default function Ajouter() {
                         />
                       </LocalizationProvider>
                     </Grid>
-                    {/*  <Grid item xs={12}>
-                      <TextField
-                        margin="normal"
-                        required
-                        fullWidth
-                        name="statut"
-                        label="Statut "
-                        type="statut"
-                        id="statut"
-                        autoComplete="statut"
-                        error={errors.statut ? true : false}
-                        helperText={errors.statut}
-                        select
-                        value={statutArticle}
-                        onChange={handleChange}
-                      >
-                        {status.map((option) => (
-                          <MenuItem key={option.value} value={option.value}>
-                            {option.label}
-                          </MenuItem>
-                        ))}
-                      </TextField>
-                        </Grid>*/}
+
                     <Grid item xs={12}>
                       <TextField
                         margin="normal"

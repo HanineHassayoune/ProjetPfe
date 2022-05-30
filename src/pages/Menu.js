@@ -33,6 +33,7 @@ import ContactPageIcon from "@mui/icons-material/ContactPage";
 import Button from "@mui/material/Button";
 import Badge from "@mui/material/Badge";
 import NotificationsIcon from "@mui/icons-material/Notifications";
+import { Avatar } from "@mui/material";
 
 const drawerWidth = 240;
 
@@ -118,8 +119,10 @@ export default function Menu({ children }) {
           >
             <MenuIcon />
           </IconButton>
+          {/*<img src="last-chance.png" height="50" width="50"></img>*/}
+
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            anti-gaspi
+            Last chance to take
           </Typography>
           <IconButton
             size="large"
@@ -266,13 +269,13 @@ export default function Menu({ children }) {
         <ListItem
           button
           onClick={() => {
-            navigate("/contacts");
+            navigate("/reclamation");
           }}
         >
           <ListItemIcon>
             <ContactPageIcon color="primary" />
           </ListItemIcon>
-          <ListItemText primary={"Contacts"} />
+          <ListItemText primary={"Réclamations"} />
         </ListItem>
 
         <ListItem

@@ -11,7 +11,7 @@ import Menu from "../pages/Menu";
 import ModifierCompte from "../pages/ModifierCompte";
 import Detail from "../pages/Detail";
 import Date from "../pages/Date";
-import Contacts from "../pages/Contacts";
+import Reclamation from "../pages/Reclamation";
 
 function DefaultLayout() {
   return (
@@ -43,7 +43,7 @@ function DefaultLayout() {
         <Route path="/modifier/compte" element={<ModifierCompte />}></Route>
         <Route path="/detail/:id" element={<Detail />}></Route>
         <Route path="/date" element={<Date />}></Route>
-        <Route path="/contacts" element={<Contacts />}></Route>
+        <Route path="/reclamation" element={<Reclamation />}></Route>
       </Routes>
     </Menu>
   );
