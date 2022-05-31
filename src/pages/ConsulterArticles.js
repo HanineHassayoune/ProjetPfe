@@ -32,7 +32,9 @@ import {
 import { getConnectedUser } from "../Helpers/FireBase";
 import { CompteModel } from "../Models/CompteModel";
 import { getUserById } from "../controleurs/CompteControleur";
+import TableFooter from "@mui/material/TableFooter";
 import SentimentVeryDissatisfiedIcon from "@mui/icons-material/SentimentVeryDissatisfied";
+
 //conposant react
 export default function ConsulterArticles() {
   const [loading, setLoading] = useState(true);
@@ -154,6 +156,12 @@ export default function ConsulterArticles() {
         return "warning";
     }
   };
+  const checkPrix = (prix) => {
+    switch (prix) {
+      case "Gratuit":
+        return "success";
+    }
+  };
 
   return (
     <>
@@ -267,8 +275,26 @@ export default function ConsulterArticles() {
                         <TableCell align="center">
                           {row.nomCommercant}
                         </TableCell>
-                        <TableCell align="center">{row.prixInitial}</TableCell>
-                        <TableCell align="center">{row.prixActuel}</TableCell>
+                        <TableCell align="center">
+                          {row.prixInitial == "0" ? (
+                            <Badge
+                              badgeContent={"Gratuit"}
+                              color={checkPrix("Gratuit")}
+                            ></Badge>
+                          ) : (
+                            row.prixInitial
+                          )}
+                        </TableCell>
+                        <TableCell align="center">
+                          {row.prixActuel == "0" ? (
+                            <Badge
+                              badgeContent={"Gratuit"}
+                              color={checkPrix("Gratuit")}
+                            ></Badge>
+                          ) : (
+                            row.prixActuel
+                          )}
+                        </TableCell>
                         <TableCell align="center">{row.unite}</TableCell>
                         <TableCell align="center" bgcolor="#e3f2fd">
                           {row.quantite}

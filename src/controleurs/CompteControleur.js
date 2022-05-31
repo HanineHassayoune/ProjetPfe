@@ -68,13 +68,5 @@ export function Deconnexion() {
 
 export const forgotPassword = (Email) => {
   console.log("Emaaillll", Email);
-  firebase
-    .auth()
-    .sendPasswordResetEmail(Email)
-    .then(function (user) {
-      alert("Please check your email...");
-    })
-    .catch(function (e) {
-      console.log(e);
-    });
+  return firebase.auth().sendPasswordResetEmail(Email);
 };

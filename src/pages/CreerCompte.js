@@ -33,6 +33,7 @@ export default function CreerCompte() {
   });
   const navigate = useNavigate();
   const isFormValid = (data) => {
+    console.log(data);
     const _errors = { ...errors };
     //verifier nom
     if (!data.nom) {
@@ -80,6 +81,7 @@ export default function CreerCompte() {
       prenom: data.get("prenom"),
       email: data.get("email"),
       numerotlf: data.get("numerotlf"),
+      password: data.get("password"),
     };
 
     if (isFormValid(dataValues)) {
@@ -187,9 +189,8 @@ export default function CreerCompte() {
                 label="Mots de passe"
                 type="password"
                 id="password"
-                //error={errors.password ? true : false}
-                //helperText={errors.password}
-                //autoComplete="current-password"
+                error={errors.password ? true : false}
+                helperText={errors.password}
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
               />
 

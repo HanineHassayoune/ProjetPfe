@@ -12,8 +12,14 @@ import { useState } from "react";
 import KeyIcon from "@mui/icons-material/Key";
 import { forgotPassword } from "../controleurs/CompteControleur";
 import Link from "@mui/material/Link";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
+import Stack from "@mui/material/Stack";
 const theme = createTheme();
-//
+//Alert si le compte n'existe pas
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 export default function MdpOublie() {
   const [errors, setErrors] = useState({
     email: "",
@@ -44,12 +50,28 @@ export default function MdpOublie() {
 
     if (isFormValid(dataValues)) {
       console.log("form valid");
-      forgotPassword(dataValues.email);
+      forgotPassword(dataValues.email)
+        .then((_user) => _user)
+        .catch((error) => {
+          console.log("error", error);
+          if (error.code == "auth/user-not-found") {
+            handleClickError();
+          }
+        });
     } else {
       console.log("form non valid");
     }
   };
-
+  const [open, setOpen] = React.useState(false);
+  const handleClickError = () => {
+    setOpen(true);
+  };
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpen(false);
+  };
   return (
     <ThemeProvider theme={theme}>
       <Grid container component="main" sx={{ height: "100vh" }}>
@@ -110,6 +132,22 @@ export default function MdpOublie() {
               >
                 Modifier
               </Button>
+              <Stack spacing={2} sx={{ width: "100%" }}>
+                <Snackbar
+                  open={open}
+                  autoHideDuration={6000}
+                  onClose={handleClose}
+                >
+                  <Alert
+                    onClose={handleClose}
+                    severity="error"
+                    sx={{ width: "100%" }}
+                  >
+                    Ce compte n'existe pas!
+                  </Alert>
+                </Snackbar>
+              </Stack>
+
               <Link href="/" variant="body2">
                 Connexion
               </Link>

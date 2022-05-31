@@ -105,7 +105,6 @@ export default function Checkout() {
               <>
                 {contact.length > 0 ? (
                   <>
-                    ({" "}
                     <List sx={{ mb: 2 }}>
                       {contact.map(({ idContact, email, message, statut }) => (
                         <React.Fragment key={idContact}>
@@ -134,7 +133,6 @@ export default function Checkout() {
                         </React.Fragment>
                       ))}
                     </List>
-                    )
                   </>
                 ) : (
                   <>
