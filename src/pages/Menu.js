@@ -34,7 +34,11 @@ import Button from "@mui/material/Button";
 import Badge from "@mui/material/Badge";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import { Avatar } from "@mui/material";
-
+import Popover from "@mui/material/Popover";
+import PopupState, { bindTrigger, bindPopover } from "material-ui-popup-state";
+import { consulterListeNotificationCurrentUser } from "../controleurs/NotificationControleur";
+import { useState, useEffect } from "react";
+import { getConnectedUser } from "../Helpers/FireBase";
 const drawerWidth = 240;
 
 const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
@@ -104,6 +108,25 @@ export default function Menu({ children }) {
   const handleDrawerClose = () => {
     setOpen(false);
   };
+  const [notifications, setNotifications] = useState([]);
+  const [countNotifications, setCountNotifications] = useState(0);
+  useEffect(() => {
+    console.log("use effect here");
+    getConnectedUser()
+      .then((_user) => {
+        consulterListeNotificationCurrentUser(_user.uid).then((snapshot) => {
+          console.log(snapshot);
+          let values = snapshot.docs.map((doc) => doc.data());
+          console.log("Notifications", values);
+          setNotifications(values);
+          let count = values.length;
+          setCountNotifications(count);
+        });
+      })
+      .catch((error) => {
+        console.error("Error : ", error);
+      });
+  }, []);
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -124,15 +147,57 @@ export default function Menu({ children }) {
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             Last chance to take
           </Typography>
-          <IconButton
-            size="large"
-            aria-label="show 17 new notifications"
-            color="inherit"
-          >
-            <Badge badgeContent={1} color="error">
-              <NotificationsIcon />
-            </Badge>
-          </IconButton>
+          <PopupState variant="popover" popupId="demo-popup-popover">
+            {(popupState) => (
+              <div>
+                <IconButton
+                  size="large"
+                  aria-label="show 17 new notifications"
+                  color="inherit"
+                  {...bindTrigger(popupState)}
+                >
+                  <Badge badgeContent={countNotifications} color="error">
+                    <NotificationsIcon />
+                  </Badge>
+                </IconButton>
+                <Popover
+                  {...bindPopover(popupState)}
+                  anchorOrigin={{
+                    vertical: "bottom",
+                    horizontal: "center",
+                  }}
+                  transformOrigin={{
+                    vertical: "top",
+                    horizontal: "center",
+                  }}
+                >
+                  {notifications.length === 0 ? (
+                    <List sx={{ mb: 2 }}>
+                      <ListItem>
+                        <ListItemText secondary={"Aucune notification !"} />
+                      </ListItem>
+                    </List>
+                  ) : (
+                    <List sx={{ mb: 2 }}>
+                      {notifications.map(
+                        ({ idArticle, titreArticle, messageNotification }) => (
+                          <React.Fragment key={idArticle}>
+                            <ListItem>
+                              <ListItemText
+                                primary={titreArticle}
+                                secondary={messageNotification}
+                              />
+                            </ListItem>
+                          </React.Fragment>
+                        )
+                      )}
+                    </List>
+                  )}
+                </Popover>
+              </div>
+            )}
+          </PopupState>
+
           <IconButton
             size="large"
             color="inherit"
