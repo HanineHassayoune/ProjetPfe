@@ -36,6 +36,7 @@ import SentimentSatisfiedAltIcon from "@mui/icons-material/SentimentSatisfiedAlt
 import InsertEmoticonIcon from "@mui/icons-material/InsertEmoticon";
 import SentimentVeryDissatisfiedIcon from "@mui/icons-material/SentimentVeryDissatisfied";
 import SentimentVerySatisfiedIcon from "@mui/icons-material/SentimentVerySatisfied";
+import Badge from "@mui/material/Badge";
 const Statistique = () => {
   const [rows, setRows] = useState([]);
   const [articles, setArticles] = useState([]);
@@ -156,6 +157,16 @@ const Statistique = () => {
 
       case "1":
         return <SentimentVeryDissatisfiedIcon sx={{ color: "blue" }} />;
+    }
+  };
+
+  const checkStatus = (status) => {
+    switch (status) {
+      case "Nouvelle":
+        return "primary";
+
+      case "Validée":
+        return "success";
     }
   };
 
@@ -524,8 +535,11 @@ const Statistique = () => {
                             <TableCell align="center">
                               {row.titrePointVente}
                             </TableCell>
-                            <TableCell align="center">
-                              {row.statutReservation}
+                            <TableCell align="center" bgcolor="#e3f2fd">
+                              <Badge
+                                badgeContent={row.statutReservation}
+                                color={checkStatus(row.statutReservation)}
+                              ></Badge>
                             </TableCell>
                             <TableCell align="center">
                               {row.dateReservation}
@@ -556,8 +570,8 @@ const Statistique = () => {
             {/* Cercle*/}
             <Grid item xs={12} sm={6}>
               <Typography variant="h6" color="#002984">
-                2-Diagramme circulaire : réprésente la quantité de chaque
-                article par type .
+                2- Diagramme circulaire : représente la quantité de chaque
+                article par type
               </Typography>
               <div style={{ width: 400 }}>
                 <PieChart chartData={cercleData} />
@@ -569,15 +583,16 @@ const Statistique = () => {
                 <BarChart chartData={userData} />
               </div>
               <Typography variant="h6" color="#002984">
-                3-Diagramme en bâtons : répresente la quantité réservée par
-                chaque client en fonction du date .
+                3-Diagramme en bâtons : représente la quantité réservée par
+                chaque client en fonction de la date
               </Typography>
             </Grid>
 
             <Grid item xs={12}>
-              <Typography variant="h6" color="#002984">
-                4-Tableau des commentaires pour chaque client :
+              <Typography variant="h5" color="#002984">
+                4-Tableau des commentaires pour chaque client
               </Typography>
+              <br />
               <Paper square sx={{ pb: "50px" }} elevation={5}>
                 <Typography
                   color="#002984"
@@ -586,7 +601,7 @@ const Statistique = () => {
                   component="div"
                   sx={{ p: 2, pb: 0 }}
                 >
-                  Avis des clients :
+                  Avis des clients
                 </Typography>
                 {commentaires.length == 0 ? (
                   <>
@@ -638,9 +653,10 @@ const Statistique = () => {
             </Grid>
             <Grid item xs={12} color="#002984">
               <Typography variant="h6">
-                5-Courbe : répresente la satisfaction des clients par chaque
-                point de vente .
+                5-Courbe : représente la satisfaction des clients par chaque
+                point de vente
               </Typography>
+              <br />
               <div style={{ width: 1000 }}>
                 {/*<LineChart chartData={degreData} />*/}
                 <BarChart chartData={degreData} />

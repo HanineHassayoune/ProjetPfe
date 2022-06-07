@@ -364,12 +364,20 @@ export default function Ajouter() {
         .then(() => {
           console.log("article saved with succes");
           console.log("dataValues ", dataValues);
+          if (dataValues.idPointVente) {
+            setIdArticlesToPointVente(dataValues.idPointVente, [dataValues.id]);
+            handleClickSuccess();
+            window.location.reload(true);
+          } else {
+            handleClickSuccess();
+            window.location.reload(true);
+          }
+
           //ajouter des id articles to point vente [array d'id articles]
-          setIdArticlesToPointVente(dataValues.idPointVente, [dataValues.id]);
+
           //alert("votre article est ajouté avec succès");
-          handleClickSuccess();
+
           //navigate("/consulter/articles");
-          window.location.reload(true);
         })
         .catch(() => {
           console.log("something went wrong !! ");

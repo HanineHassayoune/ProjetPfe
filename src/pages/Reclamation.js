@@ -69,8 +69,8 @@ export default function Checkout() {
 
   const checkStatus = (status) => {
     switch (status) {
-      case "à traiter":
-        return "info";
+      case " à traiter":
+        return "warning";
 
       case "traité":
         return "success";

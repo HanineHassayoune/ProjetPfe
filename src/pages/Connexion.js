@@ -39,7 +39,7 @@ export default function Connexion() {
     } else _errors.email = "";
 
     if (!data.password) {
-      _errors.password = "Mots de passe est obligatoire";
+      _errors.password = "Mot de passe est obligatoire";
     } else _errors.password = "";
     setErrors(_errors);
     //console.log(_errors);
@@ -160,7 +160,7 @@ export default function Connexion() {
                 required
                 fullWidth
                 name="password"
-                label="Mots de passe"
+                label="Mot de passe"
                 type="password"
                 id="password"
                 autoComplete="current-password"
@@ -195,7 +195,7 @@ export default function Connexion() {
               <Grid container>
                 <Grid item xs>
                   <Link href="/mdp/oublie" variant="body2">
-                    Mots de passe oublié?
+                    Mot de passe oublié?
                   </Link>
                 </Grid>
                 <Grid item>

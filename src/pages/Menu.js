@@ -142,7 +142,7 @@ export default function Menu({ children }) {
           >
             <MenuIcon />
           </IconButton>
-          {/*<img src="last-chance.png" height="50" width="50"></img>*/}
+          <img src="/logo.png" height="80" width="80"></img>
 
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             Last chance to take

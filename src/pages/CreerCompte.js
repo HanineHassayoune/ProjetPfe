@@ -64,7 +64,7 @@ export default function CreerCompte() {
     } else _errors.numerotlf = "";
     //verifier password
     if (!data.password) {
-      _errors.password = "Le mots de passe est obligatoire";
+      _errors.password = "Le mot de passe est obligatoire";
     } else _errors.password = "";
     //set errors
     setErrors(_errors);
@@ -186,7 +186,7 @@ export default function CreerCompte() {
                 required
                 fullWidth
                 name="password"
-                label="Mots de passe"
+                label="Mot de passe"
                 type="password"
                 id="password"
                 error={errors.password ? true : false}
@@ -205,7 +205,7 @@ export default function CreerCompte() {
               <Grid container>
                 <Grid item xs>
                   <Link href="/mdp/oublie" variant="body2">
-                    Mots de passe oublié?
+                    Mot de passe oublié?
                   </Link>
                 </Grid>
                 <Grid item>

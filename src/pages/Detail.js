@@ -336,7 +336,10 @@ export default function TransferList() {
             </Grid>
             {/* list1 */}
             <Grid item xs={9} sm={3.5}>
-              {customList("Tous les articles", left)}
+              {customList(
+                "Tous les articles qui ne sont pas associés à aucun point de vente",
+                left
+              )}
             </Grid>
             {/* les 2 boutons */}
             <Grid item xs={9} sm={2}>
@@ -367,7 +370,10 @@ export default function TransferList() {
             </Grid>
             {/* list2*/}
             <Grid item xs={9} sm={3.5}>
-              {customList("Les articles pour ce point vente", right)}
+              {customList(
+                "Les articles pour ce point vente qui ne sont pas réservés",
+                right
+              )}
             </Grid>
           </Grid>
         </>

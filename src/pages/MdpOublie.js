@@ -103,7 +103,7 @@ export default function MdpOublie() {
               <KeyIcon />
             </Avatar>
             <Typography component="h1" variant="h5">
-              Mots de passe oublié
+              Mot de passe oublié
             </Typography>
             <Box
               component="form"
